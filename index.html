@@ -341,14 +341,14 @@
 
         <div class="form-group">
             <label>Segmento:</label>
-            <select id="inputSegmento">
+            <select id="inputSegmento" onchange="verificarFaturamento()">
                 <option value="">Carregando...</option>
             </select>
         </div>
 
         <div class="form-group">
             <label>Produto:</label>
-            <select id="inpProduto">
+            <select id="inpProduto" onchange="verificarFaturamento()">
                 <option value="MultiCheck">MultiCheck</option>
                 <option value="MultiCrediário">MultiCrediário</option>
                 <option value="PayCheck">PayCheck</option>
@@ -378,8 +378,8 @@
                 <tbody>
                     <tr>
                         <td>Faturamento Presumido</td>
-                        <td><input type="text" id="inputFaturamento" placeholder="0,00" onkeyup="formatarMoedaInput(this)"></td>
-                        <td><select class="sel-alcada"></select></td>
+                        <td><input type="text" id="inputFaturamento" placeholder="0,00" onkeyup="formatarMoedaInput(this); verificarFaturamento()"></td>
+                        <td><select class="sel-alcada" id="selAlcadaFaturamento"></select></td>
                     </tr>
                     <tr>
                         <td>Data de Abertura CNPJ</td>
@@ -521,6 +521,31 @@
 </div>
 
 <script>
+    // --- MAPA DE REGRAS DE FATURAMENTO (BASEADO NO CSV) ---
+    const faturamentoRules = {
+        "MultiCheck": {
+            "AGRONEGOCIO": 270000, "ALIMENTACAO": 1000000, "AUTOMOTIVOS E NAUTICO": 1000000, "CALCADOS E ACESSORIOS": 135000,
+            "COMBUSTIVEIS": 1000000, "ELETRONICOS": 1000000, "ENTRETENIMENTO": 1000000, "INSTITUICOES DE ENSINO": 345000,
+            "JOALHERIA E BIJOUTERIAS": 135000, "MAGAZINES E LOJAS DEPARTAMENTOS": 220000, "MAQUINAS E PECAS": 270000,
+            "MATERIAL CONSTRUCAO E ACABAMENTO": 1000000, "MOVEIS E DECORACAO": 270000, "OTICA E RELOJOARIA": 135000,
+            "PRODUTOS DIVERSOS": 1000000, "SAUDE E ESTETICA": 900000, "SERVICOS DIVERSOS": 220000, "TURISMO": 1000000, "VESTUARIO": 220000
+        },
+        "MultiCrediário": {
+            "AGRONEGOCIO": 270000, "ALIMENTACAO": 1000000, "AUTOMOTIVOS E NAUTICO": 1000000, "CALCADOS E ACESSORIOS": 220000,
+            "COMBUSTIVEIS": 1000000, "ELETRONICOS": 570000, "ENTRETENIMENTO": 1000000, "INSTITUICOES DE ENSINO": 545000,
+            "JOALHERIA E BIJOUTERIAS": 185000, "MAGAZINES E LOJAS DEPARTAMENTOS": 220000, "MAQUINAS E PECAS": 270000,
+            "MATERIAL CONSTRUCAO E ACABAMENTO": 270000, "MOVEIS E DECORACAO": 270000, "OTICA E RELOJOARIA": 220000,
+            "PRODUTOS DIVERSOS": 1000000, "SAUDE E ESTETICA": 220000, "SERVICOS DIVERSOS": 220000, "TURISMO": 1000000, "VESTUARIO": 220000
+        },
+        "PayCheck": {
+            "AGRONEGOCIO": 270000, "ALIMENTACAO": 1000000, "AUTOMOTIVOS E NAUTICO": 1000000, "CALCADOS E ACESSORIOS": 220000,
+            "COMBUSTIVEIS": 1000000, "ELETRONICOS": 570000, "ENTRETENIMENTO": 1000000, "INSTITUICOES DE ENSINO": 545000,
+            "JOALHERIA E BIJOUTERIAS": 185000, "MAGAZINES E LOJAS DEPARTAMENTOS": 220000, "MAQUINAS E PECAS": 270000,
+            "MATERIAL CONSTRUCAO E ACABAMENTO": 270000, "MOVEIS E DECORACAO": 270000, "OTICA E RELOJOARIA": 220000,
+            "PRODUTOS DIVERSOS": 1000000, "SAUDE E ESTETICA": 220000, "SERVICOS DIVERSOS": 220000, "TURISMO": 1000000, "VESTUARIO": 220000
+        }
+    };
+
     // --- FUNÇÕES HELPER PARA FORMATAÇÃO BRASILEIRA ---
     function formatarMoedaInput(element) {
         let value = element.value.replace(/\D/g, "");
@@ -543,8 +568,80 @@
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
+    // --- NOVA FUNÇÃO: VERIFICA FATURAMENTO PRESUMIDO (ATUALIZADA) ---
+    function verificarFaturamento() {
+        const produto = document.getElementById('inpProduto').value;
+        const segmento = document.getElementById('inputSegmento').value;
+        const faturamentoStr = document.getElementById('inputFaturamento').value;
+        const selAlcada = document.getElementById('selAlcadaFaturamento');
+
+        // Se campo de faturamento estiver vazio -> APROVADO (Bloqueado)
+        if (!faturamentoStr || faturamentoStr.trim() === "") {
+            selAlcada.value = "Aprovado";
+            selAlcada.disabled = true;
+            selAlcada.title = "Campo de valor vazio: Aprovado automaticamente.";
+            return;
+        }
+
+        // Se não tiver produto/segmento selecionado, deixa aberto
+        if (!produto || !segmento) {
+             selAlcada.disabled = false;
+             return;
+        }
+
+        const faturamentoVal = limparValorMoeda(faturamentoStr);
+        let limite = 0;
+        if (faturamentoRules[produto] && faturamentoRules[produto][segmento]) {
+            limite = faturamentoRules[produto][segmento];
+        }
+
+        if (limite > 0) {
+            selAlcada.disabled = true;
+            
+            if (faturamentoVal < limite) {
+                // Inferior -> CAPI
+                selAlcada.value = "CAPI";
+                selAlcada.title = `Valor abaixo do limite para ${segmento} (R$ ${limite.toLocaleString('pt-BR')})`;
+            } else {
+                // Superior ou igual -> Aprovado
+                selAlcada.value = "Aprovado";
+                selAlcada.title = `Valor dentro do limite para ${segmento} (R$ ${limite.toLocaleString('pt-BR')})`;
+            }
+        } else {
+            selAlcada.disabled = false;
+            selAlcada.title = "";
+        }
+    }
+
+    // --- NOVA FUNÇÃO: VERIFICAR DATA CNPJ (REVISADA) ---
+    function verificarDataCNPJ() {
+        const inputDateVal = document.getElementById('inputDataAbertura').value;
+        const selectAlcada = document.getElementById('selAlcadaData');
+
+        if (!inputDateVal) {
+            selectAlcada.value = "";
+            selectAlcada.disabled = false;
+            return;
+        }
+
+        const dataAbertura = new Date(inputDateVal);
+        const dataLimite = new Date();
+        dataLimite.setFullYear(dataLimite.getFullYear() - 1);
+        dataAbertura.setHours(0,0,0,0);
+        dataLimite.setHours(0,0,0,0);
+
+        if (dataAbertura <= dataLimite) {
+            // >= 1 ano
+            selectAlcada.value = "Aprovado";
+            selectAlcada.disabled = true;
+        } else {
+            // < 1 ano
+            selectAlcada.value = "CAPI";
+            selectAlcada.disabled = true;
+        }
+    }
+
     async function gerarImagemResumo() {
-        // --- VALIDAÇÃO GERAL ---
         const pendenciasStr = document.getElementById('inputPendencias').value;
         const totalPendencias = limparValorMoeda(pendenciasStr);
         
@@ -554,7 +651,6 @@
             return;
         }
 
-        // LIMITE ATUALIZADO: 7.500,01
         if (totalPendencias > 7500.01) {
             let somaRestricoes = 0;
             let erroCamposTabela = false;
@@ -598,7 +694,6 @@
                 return;
             }
         }
-        // -----------------------
 
         const reportDiv = document.getElementById('reportToImage');
         const contentDiv = document.getElementById('reportContent');
@@ -656,7 +751,6 @@
 
             html += `</tbody></table>`;
 
-            // LIMITE ATUALIZADO: 7.500,01
             const rowsRestr = document.querySelectorAll('#tabelaRestricoes tbody tr');
             if(totalPendencias > 7500.01 && rowsRestr.length > 0) {
                  html += `<h4>Detalhamento de Restrições (> R$ 7.500,01)</h4>
@@ -738,7 +832,6 @@
     }
 
     const defaultSegments = ["AGRONEGOCIO", "ALIMENTACAO", "AUTOMOTIVOS E NAUTICO", "CALCADOS E ACESSORIOS", "ELETRONICOS", "ENTRETENIMENTO", "INSTITUICOES DE ENSINO", "JOALHERIA E BIJOUTERIAS", "MAGAZINES E LOJAS DEPARTAMENTOS", "MAQUINAS E PECAS", "MATERIAL CONSTRUCAO E ACABAMENTO", "MOVEIS E DECORACAO", "OTICA E RELOJOARIA", "PRODUTOS DIVERSOS", "SAUDE E ESTETICA", "SERVICOS DIVERSOS", "TURISMO", "VESTUARIO"];
-    // LISTA ATUALIZADA
     const defaultAlcadas = ["Selecione...", "Aprovado", "Alçada Regional", "Gerência Nacional de Negócios", "Diretor Nacional", "Vice - Presidência", "Presidência", "CAPI", "POC de Negócios", "Negado"];
     let currentSegments = [], currentAlcadas = [];
 
@@ -787,14 +880,14 @@
         document.getElementById('boxAlcada').style.display = (val === 'SIM') ? 'block' : 'none';
     }
     
-    // --- LÓGICA DE VERIFICAÇÃO DE PENDÊNCIAS COM ALÇADA AUTOMÁTICA ---
+    // --- LÓGICA DE ALÇADA AUTOMÁTICA DE PENDÊNCIAS ---
     function verificarPendencias() {
         const inputVal = limparValorMoeda(document.getElementById('inputPendencias').value);
         const detalheDiv = document.getElementById('formPendenciasDetalhe');
         const tbody = document.querySelector('#tabelaRestricoes tbody');
         const selAlcada = document.getElementById('selAlcadaPendencias');
 
-        // Regra de Exibição
+        // Exibição da tabela de detalhes
         if (inputVal > 7500.01) { 
             detalheDiv.style.display = 'block'; 
             if(tbody.rows.length===0) adicionarLinhaRestricao(); 
@@ -802,7 +895,7 @@
             detalheDiv.style.display = 'none'; 
         }
 
-        // Regra de Alçada Automática
+        // Lógica de Alçada Automática
         let novaAlcada = "Selecione...";
         if (inputVal > 0) {
             if (inputVal <= 7500.00) {
@@ -827,10 +920,10 @@
     function verificarDataCNPJ() {
         const inputDateVal = document.getElementById('inputDataAbertura').value;
         const selectAlcada = document.getElementById('selAlcadaData');
-        if (!inputDateVal) { selectAlcada.disabled = false; selectAlcada.value = ""; return; }
+        if (!inputDateVal) { selectAlcada.value = ""; selectAlcada.disabled = false; return; }
         const dataAbertura = new Date(inputDateVal);
-        const dataLimite = new Date(); dataLimite.setFullYear(dataLimite.getFullYear() - 1);
-        if (dataAbertura < dataLimite) { selectAlcada.value = ""; selectAlcada.disabled = true; } else { selectAlcada.disabled = false; selectAlcada.value = "CAPI"; }
+        const dataLimite = new Date(); dataLimite.setFullYear(dataLimite.getFullYear() - 1); dataAbertura.setHours(0,0,0,0); dataLimite.setHours(0,0,0,0);
+        if (dataAbertura <= dataLimite) { selectAlcada.value = "Aprovado"; selectAlcada.disabled = true; } else { selectAlcada.value = "CAPI"; selectAlcada.disabled = true; }
     }
     function adicionarLinhaAlcada() {
         const tbody = document.getElementById('tbodyAlcadaExtras');
