@@ -17,270 +17,68 @@
             --disabled-bg: #e9ecef;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #e9ecef;
-            margin: 0;
-            padding: 20px;
-            color: var(--text-color);
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        /* --- BOTÕES DO TOPO --- */
-        .top-buttons {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-reset {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            transition: background 0.3s;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; padding: 20px; color: var(--text-color); }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; }
+        
+        .top-buttons { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
+        .btn-reset { background-color: var(--success-color); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; transition: background 0.3s; }
         .btn-reset:hover { background-color: #218838; }
-
-        .btn-config {
-            background-color: var(--dark-color);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
+        .btn-config { background-color: var(--dark-color); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 16px; transition: background 0.3s; }
         .btn-config:hover { background-color: #23272b; }
 
-        /* --- ESTILOS GERAIS --- */
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            padding-top: 20px;
-        }
-
+        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; padding-top: 20px; }
         h1 { color: var(--primary-color); margin: 0; }
         h2, h3 { color: #444; margin-top: 20px; }
         h4 { margin: 0 0 10px 0; color: var(--primary-color); }
 
         .form-group { margin-bottom: 15px; }
-
         label { display: block; margin-bottom: 5px; font-weight: 600; }
+        input[type="text"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
+        input[type="file"] { background-color: white; padding: 10px; }
+        select:disabled, input:disabled { background-color: var(--disabled-bg); color: #6c757d; cursor: not-allowed; }
 
-        input[type="text"], input[type="number"], input[type="date"], select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        input[type="file"] {
-            background-color: white;
-            padding: 10px;
-        }
-
-        select:disabled, input:disabled {
-            background-color: var(--disabled-bg);
-            color: #6c757d;
-            cursor: not-allowed;
-        }
-
-        .section-content {
-            display: none;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background-color: #fafafa;
-            margin-top: 15px;
-            animation: fadeIn 0.5s;
-        }
-
-        .alcada-container {
-            display: none;
-            margin-top: 20px;
-            background: #fff;
-            padding: 15px;
-            border: 1px solid #ccc;
-        }
-
-        .alcada-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        .alcada-table th, .alcada-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
+        .section-content { display: none; padding: 20px; border: 1px solid var(--border-color); border-radius: 4px; background-color: #fafafa; margin-top: 15px; animation: fadeIn 0.5s; }
+        .alcada-container { display: none; margin-top: 20px; background: #fff; padding: 15px; border: 1px solid #ccc; }
+        
+        .alcada-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .alcada-table th, .alcada-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
         .alcada-table th { background-color: var(--primary-color); color: white; }
 
-        .sub-form-alert {
-            display: none;
-            background-color: #fff3cd;
-            border: 1px solid #ffeeba;
-            padding: 15px;
-            margin-top: 10px;
-            border-radius: 4px;
-        }
-
-        .restricao-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-            background-color: white;
-        }
-        .restricao-table th, .restricao-table td {
-            border: 1px solid #e0c482;
-            padding: 8px;
-            text-align: left;
-        }
+        .sub-form-alert { display: none; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 15px; margin-top: 10px; border-radius: 4px; }
+        
+        .restricao-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; background-color: white; }
+        .restricao-table th, .restricao-table td { border: 1px solid #e0c482; padding: 8px; text-align: left; }
         .restricao-table th { background-color: #ffecb5; color: #856404; }
 
-        .btn-add-row {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .btn-remove-row {
-            background-color: var(--danger-color);
-            color: white;
-            border: none;
-            padding: 2px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-left: 5px;
-        }
+        .btn-add-row { background-color: var(--success-color); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-remove-row { background-color: var(--danger-color); color: white; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 5px; }
 
         .flex-cell { display: flex; align-items: center; }
+        .defesa-container { margin-top: 15px; border-top: 1px solid #e0c482; padding-top: 15px; }
+        .row-dates { display: flex; gap: 15px; margin-bottom: 10px; }
+        .col-date { flex: 1; }
 
-        .defesa-container {
-            margin-top: 15px;
-            border-top: 1px solid #e0c482;
-            padding-top: 15px;
-        }
-        .row-dates {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        .col-date {
-            flex: 1;
-        }
-
-        /* --- BOTÃO GERAR --- */
-        button.btn-generate {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
+        button.btn-generate { background-color: var(--primary-color); color: white; padding: 15px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 18px; font-weight: bold; width: 100%; margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; }
         button.btn-generate:hover { background-color: #004494; }
 
-        /* --- ÁREA DE RESULTADO (MODAL) --- */
-        #resultadoModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 2000;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        
-        .resultado-content {
-            background: #fff;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }
+        #resultadoModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; padding: 20px; }
+        .resultado-content { background: #fff; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 8px; text-align: center; }
+        .btn-copy { background-color: #17a2b8; color: white; padding: 10px 25px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px; }
+        .btn-close-res { background-color: #6c757d; color: white; padding: 10px 25px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px; }
 
-        .btn-copy {
-            background-color: #17a2b8;
-            color: white;
-            padding: 10px 25px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 10px;
-        }
-        .btn-close-res {
-            background-color: #6c757d;
-            color: white;
-            padding: 10px 25px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 10px;
-        }
-
-        /* --- ESTILO DO RELATÓRIO OCULTO --- */
-        #reportToImage {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            width: 800px;
-            background: white;
-            padding: 40px;
-            font-family: Arial, sans-serif;
-            border: 1px solid #ccc;
-        }
-        
+        /* RELATÓRIO OCULTO */
+        #reportToImage { position: absolute; left: -9999px; top: 0; width: 800px; background: white; padding: 40px; font-family: Arial, sans-serif; border: 1px solid #ccc; box-sizing: border-box; }
         #reportToImage h2 { border-bottom: 2px solid #0056b3; color: #0056b3; padding-bottom: 10px; }
         .rep-row { margin-bottom: 10px; display: flex; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .rep-label { font-weight: bold; width: 250px; color: #555; }
-        .rep-value { flex: 1; color: #000; font-weight: 500;}
+        .rep-value { flex: 1; color: #000; font-weight: 500; }
         
-        .rep-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 14px;}
+        .rep-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 14px; }
         .rep-table th, .rep-table td { border: 1px solid #999; padding: 6px; text-align: left; }
         .rep-table th { background-color: #0056b3; color: white; }
 
-        .rep-images img { max-width: 100%; margin-top: 10px; border: 1px solid #ccc; padding: 5px; display: block;}
+        .rep-images img { max-width: 100%; margin-top: 10px; border: 1px solid #ccc; padding: 5px; display: block; }
 
-        /* MODAL DE CONFIGURAÇÃO */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 25px; border-radius: 8px; width: 500px; max-width: 90%; }
         .modal-footer { display: flex; justify-content: space-between; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
@@ -314,87 +112,24 @@
 
     <div id="section-VENDAS" class="section-content">
         <h2>Solicitação de Vendas</h2>
-        
-        <div class="form-group">
-            <label>Sub-tipo de Venda:</label>
-            <select id="subTipoVenda">
-                <option value="CAPI">CAPI DE VENDAS</option>
-                <option value="POC">POC DE VENDAS</option>
-            </select>
-        </div>
-
+        <div class="form-group"><label>Sub-tipo de Venda:</label><select id="subTipoVenda"><option value="CAPI">CAPI DE VENDAS</option><option value="POC">POC DE VENDAS</option></select></div>
         <h3>Dados do Cliente</h3>
-        <div class="form-group">
-            <label>Razão Social:</label>
-            <input type="text" id="inpRazao" placeholder="Digite a Razão Social" oninput="this.value = this.value.toUpperCase()">
-        </div>
-        
-        <div class="form-group">
-            <label>Nome do Lead (Sparta):</label>
-            <input type="text" id="inpLead" placeholder="Nome igual do SPARTA" oninput="this.value = this.value.toUpperCase()">
-        </div>
-
-        <div class="form-group">
-            <label>Quantidade de Lojas:</label>
-            <input type="number" id="inpLojas" placeholder="0">
-        </div>
-
-        <div class="form-group">
-            <label>Segmento:</label>
-            <select id="inputSegmento" onchange="verificarFaturamento()">
-                <option value="">Carregando...</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label>Produto:</label>
-            <select id="inpProduto" onchange="verificarFaturamento()">
-                <option value="MultiCheck">MultiCheck</option>
-                <option value="MultiCrediário">MultiCrediário</option>
-                <option value="PayCheck">PayCheck</option>
-            </select>
-        </div>
-
+        <div class="form-group"><label>Razão Social:</label><input type="text" id="inpRazao" placeholder="Digite a Razão Social" oninput="this.value = this.value.toUpperCase()"></div>
+        <div class="form-group"><label>Nome do Lead (Sparta):</label><input type="text" id="inpLead" placeholder="Nome igual do SPARTA" oninput="this.value = this.value.toUpperCase()"></div>
+        <div class="form-group"><label>Quantidade de Lojas:</label><input type="number" id="inpLojas" placeholder="0"></div>
+        <div class="form-group"><label>Segmento:</label><select id="inputSegmento" onchange="verificarFaturamento()"><option value="">Carregando...</option></select></div>
+        <div class="form-group"><label>Produto:</label><select id="inpProduto" onchange="verificarFaturamento()"><option value="MultiCheck">MultiCheck</option><option value="MultiCrediário">MultiCrediário</option><option value="PayCheck">PayCheck</option></select></div>
         <hr>
-
-        <div class="form-group">
-            <label>Há condição fora da alçada do regional?</label>
-            <select id="selectForaAlcada" onchange="toggleAlcada()">
-                <option value="NAO">NÃO</option>
-                <option value="SIM">SIM</option>
-            </select>
-        </div>
+        <div class="form-group"><label>Há condição fora da alçada do regional?</label><select id="selectForaAlcada" onchange="toggleAlcada()"><option value="NAO">NÃO</option><option value="SIM">SIM</option></select></div>
 
         <div id="boxAlcada" class="alcada-container">
             <h3>Tabela de Condições Especiais</h3>
             <table class="alcada-table" id="tabelaCondicoesBase">
-                <thead>
-                    <tr>
-                        <th style="width: 40%;">ITEM</th>
-                        <th style="width: 30%;">VALOR / DADO</th>
-                        <th style="width: 30%;">ALÇADA</th>
-                    </tr>
-                </thead>
+                <thead><tr><th style="width: 40%;">ITEM</th><th style="width: 30%;">VALOR / DADO</th><th style="width: 30%;">ALÇADA</th></tr></thead>
                 <tbody>
-                    <tr>
-                        <td>Faturamento Presumido</td>
-                        <td><input type="text" id="inputFaturamento" placeholder="0,00" onkeyup="formatarMoedaInput(this); verificarFaturamento()"></td>
-                        <td><select class="sel-alcada" id="selAlcadaFaturamento"></select></td>
-                    </tr>
-                    <tr>
-                        <td>Data de Abertura CNPJ</td>
-                        <td>
-                            <input type="date" id="inputDataAbertura" onchange="verificarDataCNPJ()">
-                        </td>
-                        <td>
-                            <select class="sel-alcada" id="selAlcadaData"></select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Pendências Financeiras (R$)</td>
-                        <td><input type="text" id="inputPendencias" placeholder="0,00" onkeyup="formatarMoedaInput(this); verificarPendencias()"></td>
-                        <td><select class="sel-alcada" id="selAlcadaPendencias"></select></td>
-                    </tr>
+                    <tr><td>Faturamento Presumido</td><td><input type="text" id="inputFaturamento" placeholder="0,00" onkeyup="formatarMoedaInput(this); verificarFaturamento()"></td><td><select class="sel-alcada" id="selAlcadaFaturamento"></select></td></tr>
+                    <tr><td>Data de Abertura CNPJ</td><td><input type="date" id="inputDataAbertura" onchange="verificarDataCNPJ()"></td><td><select class="sel-alcada" id="selAlcadaData"></select></td></tr>
+                    <tr><td>Pendências Financeiras (R$)</td><td><input type="text" id="inputPendencias" placeholder="0,00" onkeyup="formatarMoedaInput(this); verificarPendencias()"></td><td><select class="sel-alcada" id="selAlcadaPendencias"></select></td></tr>
                 </tbody>
             </table>
             
@@ -402,123 +137,41 @@
                 <h4>Resumo das Restrições (> R$ 7.500,01)</h4>
                 <p style="font-size: 13px; color: #666; margin-top: -5px;">Liste abaixo todas as pendências que compõem o valor.</p>
                 <table class="restricao-table" id="tabelaRestricoes">
-                    <thead>
-                        <tr>
-                            <th style="width: 40%;">Fornecedor</th>
-                            <th style="width: 30%;">Tipo de Restrição</th>
-                            <th style="width: 20%;">Valor (R$)</th>
-                            <th style="width: 10%;">Ação</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th style="width: 40%;">Fornecedor</th><th style="width: 30%;">Tipo de Restrição</th><th style="width: 20%;">Valor (R$)</th><th style="width: 10%;">Ação</th></tr></thead>
                     <tbody></tbody>
                 </table>
                 <button type="button" class="btn-add-row" onclick="adicionarLinhaRestricao()">+ Adicionar Linha</button>
-
                 <div class="defesa-container">
                     <h5 style="margin: 0 0 10px 0; color: #856404;">Defesa das Restrições (Obrigatório > 100 caracteres)</h5>
-                    <div class="row-dates">
-                        <div class="col-date">
-                            <label>Data da Primeira Restrição:</label>
-                            <input type="date" id="dataPrimeiraRestricao">
-                        </div>
-                        <div class="col-date">
-                            <label>Data da Última Restrição:</label>
-                            <input type="date" id="dataUltimaRestricao">
-                        </div>
-                    </div>
-                    <div>
-                        <label>Justificativa / Defesa:</label>
-                        <textarea id="textoDefesaRestricao" rows="3" placeholder="Descreva aqui a defesa relacionada às restrições informadas (Mínimo 100 caracteres)..."></textarea>
-                    </div>
+                    <div class="row-dates"><div class="col-date"><label>Data da Primeira Restrição:</label><input type="date" id="dataPrimeiraRestricao"></div><div class="col-date"><label>Data da Última Restrição:</label><input type="date" id="dataUltimaRestricao"></div></div>
+                    <div><label>Justificativa / Defesa:</label><textarea id="textoDefesaRestricao" rows="3" placeholder="Descreva aqui a defesa relacionada às restrições informadas (Mínimo 100 caracteres)..."></textarea></div>
                 </div>
             </div>
 
             <table class="alcada-table" style="margin-top:0; border-top:none;">
                 <tbody id="tbodyAlcadaExtras">
-                    <tr>
-                        <td style="width: 40%;">Taxas (IP)</td>
-                        <td style="width: 30%;"><input type="text" onkeyup="verificarGenerico(this)"></td>
-                        <td style="width: 30%;"><select class="sel-alcada"></select></td>
-                    </tr>
-                    <tr>
-                        <td>Taxas (Flat/A.M)</td>
-                        <td><input type="text" onkeyup="verificarGenerico(this)"></td>
-                        <td><select class="sel-alcada"></select></td>
-                    </tr>
-                    <tr>
-                        <td>Prazo de Acatamento</td>
-                        <td><input type="text" onkeyup="verificarGenerico(this)"></td>
-                        <td><select class="sel-alcada"></select></td>
-                    </tr>
-                    <tr>
-                        <td>TAP/TGO</td>
-                        <td><input type="text" onkeyup="verificarGenerico(this)"></td>
-                        <td><select class="sel-alcada"></select></td>
-                    </tr>
-                    <tr>
-                        <td><input type="text" placeholder="Outro Item (Digite o nome)"></td>
-                        <td><input type="text" onkeyup="verificarGenerico(this)"></td>
-                        <td><select class="sel-alcada"></select></td>
-                    </tr>
+                    <tr><td style="width: 40%;">Taxas (IP)</td><td style="width: 30%;"><input type="text" onkeyup="verificarGenerico(this)"></td><td style="width: 30%;"><select class="sel-alcada"></select></td></tr>
+                    <tr><td>Taxas (Flat/A.M)</td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
+                    <tr><td>Prazo de Acatamento</td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
+                    <tr><td>TAP/TGO</td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
+                    <tr><td><input type="text" placeholder="Outro Item (Digite o nome)"></td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
                 </tbody>
             </table>
-            
-            <div style="text-align: right; margin-top: 10px;">
-                <button type="button" class="btn-add-row" onclick="adicionarLinhaAlcada()">+ Adicionar Item Personalizado</button>
-            </div>
+            <div style="text-align: right; margin-top: 10px;"><button type="button" class="btn-add-row" onclick="adicionarLinhaAlcada()">+ Adicionar Item Personalizado</button></div>
         </div>
 
-        <div class="form-group" style="margin-top: 20px;">
-            <label for="observacoesVendas">Parecer de Vendas (Obrigatório > 100 caracteres):</label>
-            <textarea id="observacoesVendas" rows="4" placeholder="Digite aqui o parecer de vendas (Mínimo 100 caracteres)..."></textarea>
-        </div>
-
-        <div class="form-group" style="margin-top: 15px;">
-            <label for="uploadSparta">PESQUISA PROFUNDA (SPARTA):</label>
-            <input type="file" id="uploadSparta" accept="image/*" multiple>
-            <p style="font-size: 12px; color: #666; margin-top: 5px;">Selecione as imagens ou prints da pesquisa (Permite múltiplos arquivos).</p>
-        </div>
-
+        <div class="form-group" style="margin-top: 20px;"><label for="observacoesVendas">Parecer de Vendas (Obrigatório > 100 caracteres):</label><textarea id="observacoesVendas" rows="4" placeholder="Digite aqui o parecer de vendas (Mínimo 100 caracteres)..."></textarea></div>
+        <div class="form-group" style="margin-top: 15px;"><label for="uploadSparta">PESQUISA PROFUNDA (SPARTA):</label><input type="file" id="uploadSparta" accept="image/*" multiple><p style="font-size: 12px; color: #666; margin-top: 5px;">Selecione as imagens ou prints da pesquisa (Permite múltiplos arquivos).</p></div>
         <button class="btn-generate" onclick="gerarImagemResumo()">📸 GERAR SOLICITAÇÃO DE VENDAS</button>
     </div>
 
-    <div id="section-POS_VENDAS" class="section-content">
-        <h2>Pós Vendas</h2>
-        <button class="btn-generate">Gerar Solicitação</button>
-    </div>
-    <div id="section-ADMINISTRATIVO" class="section-content">
-        <h2>Administrativo</h2>
-        <button class="btn-generate">Gerar Solicitação</button>
-    </div>
+    <div id="section-POS_VENDAS" class="section-content"><h2>Pós Vendas</h2><button class="btn-generate">Gerar Solicitação</button></div>
+    <div id="section-ADMINISTRATIVO" class="section-content"><h2>Administrativo</h2><button class="btn-generate">Gerar Solicitação</button></div>
 </div>
 
-<div id="reportToImage">
-    <h2 style="text-align:center;">SOLICITAÇÃO DE VENDAS - PPI</h2>
-    <div id="reportContent"></div>
-    <div id="reportImages" class="rep-images"></div>
-</div>
-
-<div id="resultadoModal">
-    <div class="resultado-content">
-        <h3 style="color: var(--primary-color);">Solicitação Gerada com Sucesso!</h3>
-        <p>Abaixo está a imagem gerada. Clique em "Copiar Imagem" para colar no e-mail.</p>
-        <div id="imgOutputContainer" style="border: 1px solid #ccc; padding: 5px; margin-bottom: 10px; overflow-x: auto;"></div>
-        <button class="btn-copy" onclick="copiarImagem()">📋 Copiar Imagem</button>
-        <button class="btn-close-res" onclick="document.getElementById('resultadoModal').style.display='none'">Fechar</button>
-    </div>
-</div>
-
-<div id="configModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header"><h3>Configurações</h3><span style="cursor:pointer; font-size:20px;" onclick="fecharConfig()">×</span></div>
-        <label>Segmentos:</label><textarea id="cfgSegmentos" class="config-area"></textarea>
-        <label>Alçadas:</label><textarea id="cfgAlcadas" class="config-area"></textarea>
-        <div class="modal-footer">
-            <button class="btn-reset-factory" onclick="resetarFabrica()">Restaurar Padrões</button>
-            <div><button onclick="fecharConfig()" style="margin-right:5px; padding:5px;">Cancelar</button><button onclick="salvarConfig()" style="padding:5px;">Salvar</button></div>
-        </div>
-    </div>
-</div>
+<div id="reportToImage"><h2 style="text-align:center;">SOLICITAÇÃO DE VENDAS - PPI</h2><div id="reportContent"></div><div id="reportImages" class="rep-images"></div></div>
+<div id="resultadoModal"><div class="resultado-content"><h3 style="color: var(--primary-color);">Solicitação Gerada com Sucesso!</h3><p>Abaixo está a imagem gerada. Clique em "Copiar Imagem" para colar no e-mail.</p><div id="imgOutputContainer" style="border: 1px solid #ccc; padding: 5px; margin-bottom: 10px; overflow-x: auto;"></div><button class="btn-copy" onclick="copiarImagem()">📋 Copiar Imagem</button><button class="btn-close-res" onclick="document.getElementById('resultadoModal').style.display='none'">Fechar</button></div></div>
+<div id="configModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Configurações</h3><span style="cursor:pointer; font-size:20px;" onclick="fecharConfig()">×</span></div><label>Segmentos:</label><textarea id="cfgSegmentos" class="config-area"></textarea><label>Alçadas:</label><textarea id="cfgAlcadas" class="config-area"></textarea><div class="modal-footer"><button class="btn-reset-factory" onclick="resetarFabrica()">Restaurar Padrões</button><div><button onclick="fecharConfig()" style="margin-right:5px; padding:5px;">Cancelar</button><button onclick="salvarConfig()" style="padding:5px;">Salvar</button></div></div></div></div>
 
 <script>
     const faturamentoRules = {"MultiCheck":{"AGRONEGOCIO":270000,"ALIMENTACAO":1000000,"AUTOMOTIVOS E NAUTICO":1000000,"CALCADOS E ACESSORIOS":135000,"COMBUSTIVEIS":1000000,"ELETRONICOS":1000000,"ENTRETENIMENTO":1000000,"INSTITUICOES DE ENSINO":345000,"JOALHERIA E BIJOUTERIAS":135000,"MAGAZINES E LOJAS DEPARTAMENTOS":220000,"MAQUINAS E PECAS":270000,"MATERIAL CONSTRUCAO E ACABAMENTO":1000000,"MOVEIS E DECORACAO":270000,"OTICA E RELOJOARIA":135000,"PRODUTOS DIVERSOS":1000000,"SAUDE E ESTETICA":900000,"SERVICOS DIVERSOS":220000,"TURISMO":1000000,"VESTUARIO":220000},"MultiCrediário":{"AGRONEGOCIO":270000,"ALIMENTACAO":1000000,"AUTOMOTIVOS E NAUTICO":1000000,"CALCADOS E ACESSORIOS":220000,"COMBUSTIVEIS":1000000,"ELETRONICOS":570000,"ENTRETENIMENTO":1000000,"INSTITUICOES DE ENSINO":545000,"JOALHERIA E BIJOUTERIAS":185000,"MAGAZINES E LOJAS DEPARTAMENTOS":220000,"MAQUINAS E PECAS":270000,"MATERIAL CONSTRUCAO E ACABAMENTO":270000,"MOVEIS E DECORACAO":270000,"OTICA E RELOJOARIA":220000,"PRODUTOS DIVERSOS":1000000,"SAUDE E ESTETICA":220000,"SERVICOS DIVERSOS":220000,"TURISMO":1000000,"VESTUARIO":220000},"PayCheck":{"AGRONEGOCIO":270000,"ALIMENTACAO":1000000,"AUTOMOTIVOS E NAUTICO":1000000,"CALCADOS E ACESSORIOS":220000,"COMBUSTIVEIS":1000000,"ELETRONICOS":570000,"ENTRETENIMENTO":1000000,"INSTITUICOES DE ENSINO":545000,"JOALHERIA E BIJOUTERIAS":185000,"MAGAZINES E LOJAS DEPARTAMENTOS":220000,"MAQUINAS E PECAS":270000,"MATERIAL CONSTRUCAO E ACABAMENTO":270000,"MOVEIS E DECORACAO":270000,"OTICA E RELOJOARIA":220000,"PRODUTOS DIVERSOS":1000000,"SAUDE E ESTETICA":220000,"SERVICOS DIVERSOS":220000,"TURISMO":1000000,"VESTUARIO":220000}};
@@ -563,7 +216,6 @@
             selAlcada.title = "Campo de valor vazio ou zerado: Aprovado automaticamente.";
             return;
         }
-
         if (!produto || !segmento) { selAlcada.disabled = false; return; }
 
         let limite = 0;
@@ -609,7 +261,6 @@
         else if (inputVal <= 35000.00) { novaAlcada = "Gerência Nacional de Negócios"; }
         else if (inputVal <= 70000.00) { novaAlcada = "Vice - Presidência"; }
         else { novaAlcada = "Presidência"; }
-        
         selAlcada.value = novaAlcada;
     }
 
@@ -649,10 +300,7 @@
         const td2 = document.createElement('td'); td2.innerHTML = '<input type="text" placeholder="Valor" onkeyup="verificarGenerico(this)">';
         const td3 = document.createElement('td'); td3.className = 'flex-cell';
         const select = document.createElement('select'); select.className = 'sel-alcada';
-        
-        select.value = "Aprovado";
-        select.disabled = true;
-
+        select.value = "Aprovado"; select.disabled = true;
         currentAlcadas.forEach(alc => { let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); });
         const btnDel = document.createElement('button'); btnDel.type = 'button'; btnDel.textContent = 'X'; btnDel.className = 'btn-remove-row'; btnDel.onclick = function() { tbody.removeChild(row); };
         td3.appendChild(select); td3.appendChild(btnDel);
@@ -661,10 +309,14 @@
 
     async function gerarImagemResumo() {
         try {
-            if (typeof html2canvas === 'undefined') {
-                alert("Erro: Biblioteca de geração de imagem não carregou. Verifique sua conexão.");
-                return;
-            }
+            const razao = document.getElementById('inpRazao').value.trim();
+            const lead = document.getElementById('inpLead').value.trim();
+            const lojas = document.getElementById('inpLojas').value.trim();
+            const segmento = document.getElementById('inputSegmento').value;
+            const produto = document.getElementById('inpProduto').value;
+
+            if (!razao || !lead || !lojas || !segmento || !produto) { alert("ERRO: Preencha campos obrigatórios (Razão, Lead, Lojas, Segmento, Produto)."); return; }
+            if (typeof html2canvas === 'undefined') { alert("Erro: Biblioteca de imagem não carregou."); return; }
 
             const pendenciasStr = document.getElementById('inputPendencias').value;
             const totalPendencias = limparValorMoeda(pendenciasStr);
@@ -686,7 +338,7 @@
                 if (Math.abs(totalPendencias - somaRestricoes) > 0.01) { alert("Soma das restrições não bate com o total."); return; }
 
                 const txtDefesa = document.getElementById('textoDefesaRestricao').value.trim();
-                if (!document.getElementById('dataPrimeiraRestricao').value || !document.getElementById('dataUltimaRestricao').value) { alert("Preencha as datas das restrições."); return; }
+                if (!document.getElementById('dataPrimeiraRestricao').value || !document.getElementById('dataUltimaRestricao').value) { alert("Preencha datas das restrições."); return; }
                 if (txtDefesa.length < 100) { alert("Defesa deve ter no mínimo 100 caracteres."); return; }
             }
 
@@ -695,15 +347,9 @@
             const imgDiv = document.getElementById('reportImages');
             contentDiv.innerHTML = ''; imgDiv.innerHTML = '';
 
-            const subtipo = document.getElementById('subTipoVenda').value;
-            const razao = document.getElementById('inpRazao').value || '-';
-            const lead = document.getElementById('inpLead').value || '-';
-            const lojas = document.getElementById('inpLojas').value || '-';
-            const segmento = document.getElementById('inputSegmento').value || '-';
-            const produto = document.getElementById('inpProduto').value || '-';
             const foraAlcada = document.getElementById('selectForaAlcada').value;
 
-            let html = `<div class="rep-row"><span class="rep-label">Tipo:</span> <span class="rep-value">VENDAS (${subtipo})</span></div>
+            let html = `<div class="rep-row"><span class="rep-label">Tipo:</span> <span class="rep-value">VENDAS (${document.getElementById('subTipoVenda').value})</span></div>
                         <div class="rep-row"><span class="rep-label">Razão:</span> <span class="rep-value">${razao}</span></div>
                         <div class="rep-row"><span class="rep-label">Lead:</span> <span class="rep-value">${lead}</span></div>
                         <div class="rep-row"><span class="rep-label">Lojas:</span> <span class="rep-value">${lojas}</span></div>
@@ -734,18 +380,28 @@
                 html += `</tbody></table>`;
 
                 if(totalPendencias > 7500.01) {
-                    html += `<h4>Detalhamento Restrições</h4><table class="rep-table"><thead><tr><th>Forn.</th><th>Tipo</th><th>Valor</th></tr></thead><tbody>`;
+                    // DESTAQUE VERMELHO AQUI
+                    html += `<div style="border: 2px solid #dc3545; padding: 10px; margin-top: 15px; border-radius: 5px; background-color: #fff8f8;">
+                                <h4 style="color: #dc3545; margin-top: 0; border-bottom: none;">⚠️ Detalhamento de Restrições (> R$ 7.500,01)</h4>
+                                <table class="rep-table" style="width: 100%; border: 1px solid #dc3545;">
+                                    <thead><tr style="background-color: #dc3545; color: white;"><th>Fornecedor</th><th>Tipo de Restrição</th><th>Valor (R$)</th></tr></thead>
+                                    <tbody>`;
                     document.querySelectorAll('#tabelaRestricoes tbody tr').forEach(tr => {
                         const inputs = tr.querySelectorAll('input');
                         if(inputs[2].value) html += `<tr><td>${inputs[0].value}</td><td>${inputs[1].value}</td><td>R$ ${inputs[2].value}</td></tr>`;
                     });
                     html += `</tbody></table>`;
+                    
                     const dt1 = formatarDataBR(document.getElementById('dataPrimeiraRestricao').value);
                     const dt2 = formatarDataBR(document.getElementById('dataUltimaRestricao').value);
-                    html += `<div style="border:1px solid #e0c482; padding:8px; margin-top:10px;"><strong>DEFESA:</strong> (1ª: ${dt1} / Últ: ${dt2})<br>${document.getElementById('textoDefesaRestricao').value}</div>`;
+                    const def = document.getElementById('textoDefesaRestricao').value;
+                    html += `<div style="margin-top:10px; padding:10px; background:white; border:1px solid #f5c6cb;">
+                                <strong style="color:#721c24;">DEFESA (1ª: ${dt1} / Últ: ${dt2}):</strong><br>
+                                <div style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; margin-top:5px; color:#333;">${def}</div>
+                             </div></div>`;
                 }
             }
-            html += `<div style="margin-top:20px; border:1px solid #ddd; padding:10px;"><strong>PARECER:</strong><br>${parecer}</div>`;
+            html += `<div style="margin-top:20px; border:1px solid #ddd; padding:10px;"><strong>PARECER:</strong><br><div style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;">${parecer}</div></div>`;
             contentDiv.innerHTML = html;
 
             const fileInput = document.getElementById('uploadSparta');
@@ -778,8 +434,6 @@
     window.onload = function() {
         carregarConfiguracoes();
         renderizarMenus();
-        
-        // Inicialização Forçada de Estado
         verificarFaturamento();
         verificarDataCNPJ();
         verificarPendencias();
@@ -791,16 +445,11 @@
         const storedAlcs = localStorage.getItem('ppi_alcadas');
         currentSegments = storedSegs ? JSON.parse(storedSegs) : [...defaultSegments];
         currentAlcadas = storedAlcs ? JSON.parse(storedAlcs) : [...defaultAlcadas];
-
-        // AUTO-CORREÇÃO CRÍTICA
         const required = ["Aprovado", "CAPI", "Negado", "Alçada Regional", "Gerência Nacional de Negócios", "Vice - Presidência", "Presidência"];
         let mudou = false;
-        required.forEach(req => {
-            if(!currentAlcadas.includes(req)) { currentAlcadas.unshift(req); mudou = true; }
-        });
+        required.forEach(req => { if(!currentAlcadas.includes(req)) { currentAlcadas.unshift(req); mudou = true; } });
         if(mudou) localStorage.setItem('ppi_alcadas', JSON.stringify(currentAlcadas));
     }
-
     function renderizarMenus() {
         const segSelect = document.getElementById('inputSegmento');
         segSelect.innerHTML = '<option value="">Selecione...</option>';
@@ -812,9 +461,7 @@
             const valorAtual = select.value;
             select.innerHTML = ''; 
             currentAlcadas.forEach(alc => { let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); });
-            if(currentAlcadas.includes(valorAtual)) {
-                select.value = valorAtual;
-            }
+            if(currentAlcadas.includes(valorAtual)) { select.value = valorAtual; }
         });
     }
     function abrirConfig() { document.getElementById('cfgSegmentos').value = currentSegments.join('\n'); document.getElementById('cfgAlcadas').value = currentAlcadas.join('\n'); document.getElementById('configModal').style.display = 'flex'; }
