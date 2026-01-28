@@ -521,32 +521,8 @@
 </div>
 
 <script>
-    // --- MAPA DE REGRAS DE FATURAMENTO (BASEADO NO CSV) ---
-    const faturamentoRules = {
-        "MultiCheck": {
-            "AGRONEGOCIO": 270000, "ALIMENTACAO": 1000000, "AUTOMOTIVOS E NAUTICO": 1000000, "CALCADOS E ACESSORIOS": 135000,
-            "COMBUSTIVEIS": 1000000, "ELETRONICOS": 1000000, "ENTRETENIMENTO": 1000000, "INSTITUICOES DE ENSINO": 345000,
-            "JOALHERIA E BIJOUTERIAS": 135000, "MAGAZINES E LOJAS DEPARTAMENTOS": 220000, "MAQUINAS E PECAS": 270000,
-            "MATERIAL CONSTRUCAO E ACABAMENTO": 1000000, "MOVEIS E DECORACAO": 270000, "OTICA E RELOJOARIA": 135000,
-            "PRODUTOS DIVERSOS": 1000000, "SAUDE E ESTETICA": 900000, "SERVICOS DIVERSOS": 220000, "TURISMO": 1000000, "VESTUARIO": 220000
-        },
-        "MultiCrediário": {
-            "AGRONEGOCIO": 270000, "ALIMENTACAO": 1000000, "AUTOMOTIVOS E NAUTICO": 1000000, "CALCADOS E ACESSORIOS": 220000,
-            "COMBUSTIVEIS": 1000000, "ELETRONICOS": 570000, "ENTRETENIMENTO": 1000000, "INSTITUICOES DE ENSINO": 545000,
-            "JOALHERIA E BIJOUTERIAS": 185000, "MAGAZINES E LOJAS DEPARTAMENTOS": 220000, "MAQUINAS E PECAS": 270000,
-            "MATERIAL CONSTRUCAO E ACABAMENTO": 270000, "MOVEIS E DECORACAO": 270000, "OTICA E RELOJOARIA": 220000,
-            "PRODUTOS DIVERSOS": 1000000, "SAUDE E ESTETICA": 220000, "SERVICOS DIVERSOS": 220000, "TURISMO": 1000000, "VESTUARIO": 220000
-        },
-        "PayCheck": {
-            "AGRONEGOCIO": 270000, "ALIMENTACAO": 1000000, "AUTOMOTIVOS E NAUTICO": 1000000, "CALCADOS E ACESSORIOS": 220000,
-            "COMBUSTIVEIS": 1000000, "ELETRONICOS": 570000, "ENTRETENIMENTO": 1000000, "INSTITUICOES DE ENSINO": 545000,
-            "JOALHERIA E BIJOUTERIAS": 185000, "MAGAZINES E LOJAS DEPARTAMENTOS": 220000, "MAQUINAS E PECAS": 270000,
-            "MATERIAL CONSTRUCAO E ACABAMENTO": 270000, "MOVEIS E DECORACAO": 270000, "OTICA E RELOJOARIA": 220000,
-            "PRODUTOS DIVERSOS": 1000000, "SAUDE E ESTETICA": 220000, "SERVICOS DIVERSOS": 220000, "TURISMO": 1000000, "VESTUARIO": 220000
-        }
-    };
+    const faturamentoRules = {"MultiCheck":{"AGRONEGOCIO":270000,"ALIMENTACAO":1000000,"AUTOMOTIVOS E NAUTICO":1000000,"CALCADOS E ACESSORIOS":135000,"COMBUSTIVEIS":1000000,"ELETRONICOS":1000000,"ENTRETENIMENTO":1000000,"INSTITUICOES DE ENSINO":345000,"JOALHERIA E BIJOUTERIAS":135000,"MAGAZINES E LOJAS DEPARTAMENTOS":220000,"MAQUINAS E PECAS":270000,"MATERIAL CONSTRUCAO E ACABAMENTO":1000000,"MOVEIS E DECORACAO":270000,"OTICA E RELOJOARIA":135000,"PRODUTOS DIVERSOS":1000000,"SAUDE E ESTETICA":900000,"SERVICOS DIVERSOS":220000,"TURISMO":1000000,"VESTUARIO":220000},"MultiCrediário":{"AGRONEGOCIO":270000,"ALIMENTACAO":1000000,"AUTOMOTIVOS E NAUTICO":1000000,"CALCADOS E ACESSORIOS":220000,"COMBUSTIVEIS":1000000,"ELETRONICOS":570000,"ENTRETENIMENTO":1000000,"INSTITUICOES DE ENSINO":545000,"JOALHERIA E BIJOUTERIAS":185000,"MAGAZINES E LOJAS DEPARTAMENTOS":220000,"MAQUINAS E PECAS":270000,"MATERIAL CONSTRUCAO E ACABAMENTO":270000,"MOVEIS E DECORACAO":270000,"OTICA E RELOJOARIA":220000,"PRODUTOS DIVERSOS":1000000,"SAUDE E ESTETICA":220000,"SERVICOS DIVERSOS":220000,"TURISMO":1000000,"VESTUARIO":220000},"PayCheck":{"AGRONEGOCIO":270000,"ALIMENTACAO":1000000,"AUTOMOTIVOS E NAUTICO":1000000,"CALCADOS E ACESSORIOS":220000,"COMBUSTIVEIS":1000000,"ELETRONICOS":570000,"ENTRETENIMENTO":1000000,"INSTITUICOES DE ENSINO":545000,"JOALHERIA E BIJOUTERIAS":185000,"MAGAZINES E LOJAS DEPARTAMENTOS":220000,"MAQUINAS E PECAS":270000,"MATERIAL CONSTRUCAO E ACABAMENTO":270000,"MOVEIS E DECORACAO":270000,"OTICA E RELOJOARIA":220000,"PRODUTOS DIVERSOS":1000000,"SAUDE E ESTETICA":220000,"SERVICOS DIVERSOS":220000,"TURISMO":1000000,"VESTUARIO":220000}};
 
-    // --- FUNÇÕES HELPER PARA FORMATAÇÃO BRASILEIRA ---
     function formatarMoedaInput(element) {
         let value = element.value.replace(/\D/g, "");
         value = (value / 100).toFixed(2) + "";
@@ -554,39 +530,26 @@
         value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
         element.value = value;
     }
-
     function limparValorMoeda(valorStr) {
         if (!valorStr) return 0;
         let limpo = valorStr.replace(/\./g, "").replace(",", ".");
         return parseFloat(limpo) || 0;
     }
-
     function formatarDataBR(dataStr) {
         if(!dataStr) return "-";
         const partes = dataStr.split('-');
         if(partes.length !== 3) return dataStr;
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
-
-    // --- FUNÇÃO PARA CAMPOS GENÉRICOS (TAXAS, ETC) ---
     function verificarGenerico(input) {
         const row = input.closest('tr');
         const select = row.querySelector('.sel-alcada');
         if(!select) return;
-
         const valStr = input.value.trim();
         const valNum = limparValorMoeda(valStr);
-
-        // Se Vazio ou Zero -> Aprovado e Bloqueado
-        if (valStr === "" || valStr === "0,00" || valNum === 0) {
-            select.value = "Aprovado";
-            select.disabled = true;
-        } else {
-            select.disabled = false;
-        }
+        if (valStr === "" || valStr === "0,00" || valNum === 0) { select.value = "Aprovado"; select.disabled = true; } else { select.disabled = false; }
     }
 
-    // --- FUNÇÃO FATURAMENTO ATUALIZADA (REGRA VAZIO/0 = APROVADO) ---
     function verificarFaturamento() {
         const produto = document.getElementById('inpProduto').value;
         const segmento = document.getElementById('inputSegmento').value;
@@ -594,7 +557,6 @@
         const selAlcada = document.getElementById('selAlcadaFaturamento');
         const faturamentoVal = limparValorMoeda(faturamentoStr);
 
-        // Se vazio ou 0,00 -> Aprovado e Bloqueado (REGRA GERAL)
         if (!faturamentoStr || faturamentoStr.trim() === "" || faturamentoVal === 0) {
             selAlcada.value = "Aprovado";
             selAlcada.disabled = true;
@@ -602,11 +564,7 @@
             return;
         }
 
-        // Se não tiver produto/segmento selecionado, deixa aberto
-        if (!produto || !segmento) {
-             selAlcada.disabled = false;
-             return;
-        }
+        if (!produto || !segmento) { selAlcada.disabled = false; return; }
 
         let limite = 0;
         if (faturamentoRules[produto] && faturamentoRules[produto][segmento]) {
@@ -615,21 +573,16 @@
 
         if (limite > 0) {
             selAlcada.disabled = true;
-            
             if (faturamentoVal < limite) {
                 selAlcada.value = "CAPI";
-                selAlcada.title = `Valor abaixo do limite para ${segmento} (R$ ${limite.toLocaleString('pt-BR')})`;
             } else {
                 selAlcada.value = "Aprovado";
-                selAlcada.title = `Valor dentro do limite para ${segmento} (R$ ${limite.toLocaleString('pt-BR')})`;
             }
         } else {
             selAlcada.disabled = false;
-            selAlcada.title = "";
         }
     }
 
-    // --- LÓGICA DE ALÇADA AUTOMÁTICA DE PENDÊNCIAS (ATUALIZADA) ---
     function verificarPendencias() {
         const inputValStr = document.getElementById('inputPendencias').value;
         const inputVal = limparValorMoeda(inputValStr);
@@ -637,7 +590,6 @@
         const tbody = document.querySelector('#tabelaRestricoes tbody');
         const selAlcada = document.getElementById('selAlcadaPendencias');
 
-        // Exibição da tabela de detalhes (> 7500.01)
         if (inputVal > 7500.01) { 
             detalheDiv.style.display = 'block'; 
             if(tbody.rows.length===0) adicionarLinhaRestricao(); 
@@ -645,26 +597,18 @@
             detalheDiv.style.display = 'none'; 
         }
 
-        // Regra de Alçada: Se vazio ou 0 -> Aprovado e Bloqueado
         if (!inputValStr || inputVal === 0) {
             selAlcada.value = "Aprovado";
             selAlcada.disabled = true;
             return;
         }
 
-        // Se tiver valor, aplica a lógica de faixas (e bloqueia também)
         selAlcada.disabled = true; 
         let novaAlcada = "Selecione...";
-        
-        if (inputVal <= 7500.00) {
-            novaAlcada = "Aprovado";
-        } else if (inputVal <= 35000.00) {
-            novaAlcada = "Gerência Nacional de Negócios";
-        } else if (inputVal <= 70000.00) {
-            novaAlcada = "Vice - Presidência";
-        } else {
-            novaAlcada = "Presidência";
-        }
+        if (inputVal <= 7500.00) { novaAlcada = "Aprovado"; }
+        else if (inputVal <= 35000.00) { novaAlcada = "Gerência Nacional de Negócios"; }
+        else if (inputVal <= 70000.00) { novaAlcada = "Vice - Presidência"; }
+        else { novaAlcada = "Presidência"; }
         
         selAlcada.value = novaAlcada;
     }
@@ -676,12 +620,10 @@
         tbody.appendChild(row);
     }
 
-    // --- DATA CNPJ (ATUALIZADA) ---
     function verificarDataCNPJ() {
         const inputDateVal = document.getElementById('inputDataAbertura').value;
         const selectAlcada = document.getElementById('selAlcadaData');
         
-        // Vazio -> Aprovado e Bloqueado (NOVA REGRA APLICADA)
         if (!inputDateVal) { 
             selectAlcada.value = "Aprovado"; 
             selectAlcada.disabled = true; 
@@ -708,7 +650,6 @@
         const td3 = document.createElement('td'); td3.className = 'flex-cell';
         const select = document.createElement('select'); select.className = 'sel-alcada';
         
-        // Inicializa como Aprovado/Bloqueado
         select.value = "Aprovado";
         select.disabled = true;
 
@@ -719,204 +660,115 @@
     }
 
     async function gerarImagemResumo() {
-        // --- VALIDAÇÃO GERAL ---
-        const pendenciasStr = document.getElementById('inputPendencias').value;
-        const totalPendencias = limparValorMoeda(pendenciasStr);
-        
-        const parecer = document.getElementById('observacoesVendas').value || '';
-        if(parecer.length < 100) {
-            alert(`ERRO DE VALIDAÇÃO:\n\nO campo 'Parecer de Vendas' deve ter no mínimo 100 caracteres.\nAtual: ${parecer.length} caracteres.`);
-            return;
-        }
+        try {
+            if (typeof html2canvas === 'undefined') {
+                alert("Erro: Biblioteca de geração de imagem não carregou. Verifique sua conexão.");
+                return;
+            }
 
-        if (totalPendencias > 7500.01) {
-            let somaRestricoes = 0;
-            let erroCamposTabela = false;
-            const rows = document.querySelectorAll('#tabelaRestricoes tbody tr');
+            const pendenciasStr = document.getElementById('inputPendencias').value;
+            const totalPendencias = limparValorMoeda(pendenciasStr);
+            const parecer = document.getElementById('observacoesVendas').value || '';
             
-            rows.forEach(row => {
-                const inputs = row.querySelectorAll('input');
-                const fornecedor = inputs[0].value.trim();
-                const tipo = inputs[1].value.trim();
-                const valStr = inputs[2].value;
-                const val = limparValorMoeda(valStr);
+            if(parecer.length < 100) { alert(`ERRO: Parecer de Vendas deve ter no mínimo 100 caracteres.`); return; }
 
-                if (valStr !== "" && (fornecedor === "" || tipo === "")) {
-                    erroCamposTabela = true;
-                }
-                somaRestricoes += val;
-            });
-
-            if (erroCamposTabela) {
-                alert("ERRO DE VALIDAÇÃO (TABELA):\n\nPara cada restrição com valor, preencha 'Fornecedor' e 'Tipo'.");
-                return;
-            }
-
-            const diff = Math.abs(totalPendencias - somaRestricoes);
-            if (diff > 0.01) {
-                alert(`ERRO DE SOMA:\n\nTotal Pendências: R$ ${totalPendencias.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\nSoma Restrições: R$ ${somaRestricoes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\n\nAjuste os valores.`);
-                return; 
-            }
-
-            const dtPrim = document.getElementById('dataPrimeiraRestricao').value;
-            const dtUlt = document.getElementById('dataUltimaRestricao').value;
-            const txtDefesa = document.getElementById('textoDefesaRestricao').value.trim();
-
-            if (!dtPrim || !dtUlt) {
-                alert("ERRO DE VALIDAÇÃO (DATAS):\n\nPreencha as Datas da Primeira e Última Restrição.");
-                return;
-            }
-
-            if (txtDefesa.length < 100) {
-                alert(`ERRO DE VALIDAÇÃO (DEFESA):\n\nA 'Justificativa / Defesa' deve ter no mínimo 100 caracteres.\nAtual: ${txtDefesa.length} caracteres.`);
-                return;
-            }
-        }
-        // -----------------------
-
-        const reportDiv = document.getElementById('reportToImage');
-        const contentDiv = document.getElementById('reportContent');
-        const imgDiv = document.getElementById('reportImages');
-        
-        contentDiv.innerHTML = '';
-        imgDiv.innerHTML = '';
-
-        const subtipo = document.getElementById('subTipoVenda').value;
-        const razao = document.getElementById('inpRazao').value || '-';
-        const lead = document.getElementById('inpLead').value || '-';
-        const lojas = document.getElementById('inpLojas').value || '-';
-        const segmento = document.getElementById('inputSegmento').value || '-';
-        const produto = document.getElementById('inpProduto').value || '-';
-        const foraAlcada = document.getElementById('selectForaAlcada').value;
-        
-        let html = `
-            <div class="rep-row"><span class="rep-label">Tipo de Solicitação:</span> <span class="rep-value">VENDAS (${subtipo})</span></div>
-            <div class="rep-row"><span class="rep-label">Razão Social:</span> <span class="rep-value">${razao}</span></div>
-            <div class="rep-row"><span class="rep-label">Lead (Sparta):</span> <span class="rep-value">${lead}</span></div>
-            <div class="rep-row"><span class="rep-label">Qtd. Lojas:</span> <span class="rep-value">${lojas}</span></div>
-            <div class="rep-row"><span class="rep-label">Segmento:</span> <span class="rep-value">${segmento}</span></div>
-            <div class="rep-row"><span class="rep-label">Produto:</span> <span class="rep-value">${produto}</span></div>
-            <div class="rep-row"><span class="rep-label">Fora da Alçada Regional?</span> <span class="rep-value">${foraAlcada}</span></div>
-        `;
-
-        if(foraAlcada === 'SIM') {
-            html += `<h3>Condições Especiais & Alçadas</h3>
-                     <table class="rep-table">
-                        <thead><tr><th>Item</th><th>Valor/Dado</th><th>Alçada</th></tr></thead>
-                        <tbody>`;
-            
-            // --- LOOP BASE ---
-            const rowsBase = document.querySelectorAll('#tabelaCondicoesBase tbody tr');
-            rowsBase.forEach(tr => {
-                const tds = tr.querySelectorAll('td');
-                const item = tds[0].innerText.trim();
-                let val = tds[1].querySelector('input') ? tds[1].querySelector('input').value : '';
-                
-                if(item.includes("Data")) val = formatarDataBR(val);
-
-                let alc = tds[2].querySelector('select') ? tds[2].querySelector('select').value : '';
-                
-                // NOVO FILTRO: Se não for "Aprovado", mostra na imagem
-                if (alc !== "Aprovado") {
-                    html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
-                }
-            });
-
-            // --- LOOP EXTRAS ---
-            const rowsExtra = document.querySelectorAll('#tbodyAlcadaExtras tr');
-            rowsExtra.forEach(tr => {
-                const tds = tr.querySelectorAll('td');
-                let item = tds[0].querySelector('input') ? tds[0].querySelector('input').value : (tds[0].innerText.trim());
-                let val = tds[1].querySelector('input') ? tds[1].querySelector('input').value : '';
-                let alc = tds[2].querySelector('select') ? tds[2].querySelector('select').value : '';
-                
-                // NOVO FILTRO: Se não for "Aprovado", mostra na imagem
-                if(item && alc !== "Aprovado") {
-                    html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
-                }
-            });
-
-            html += `</tbody></table>`;
-
-            // LIMITE ATUALIZADO: 7.500,01
-            const rowsRestr = document.querySelectorAll('#tabelaRestricoes tbody tr');
-            if(totalPendencias > 7500.01 && rowsRestr.length > 0) {
-                 html += `<h4>Detalhamento de Restrições (> R$ 7.500,01)</h4>
-                          <table class="rep-table" style="border-color:#e0c482">
-                            <thead><tr style="background:#ffecb5; color:#856404"><th>Fornecedor</th><th>Restrição</th><th>Valor</th></tr></thead>
-                            <tbody>`;
-                 rowsRestr.forEach(tr => {
-                    const inputs = tr.querySelectorAll('input');
-                    if(inputs[2].value) {
-                        html += `<tr><td>${inputs[0].value}</td><td>${inputs[1].value}</td><td>R$ ${inputs[2].value}</td></tr>`;
-                    }
-                 });
-                 html += `</tbody></table>`;
-
-                 const dtPrim = formatarDataBR(document.getElementById('dataPrimeiraRestricao').value);
-                 const dtUlt = formatarDataBR(document.getElementById('dataUltimaRestricao').value);
-                 const txtDefesa = document.getElementById('textoDefesaRestricao').value;
-
-                 html += `<div style="margin-top:10px; border:1px solid #e0c482; padding:8px; background:#fffbf0;">
-                            <strong>DEFESA DAS RESTRIÇÕES:</strong><br>
-                            <div style="display:flex; justify-content:space-between; margin-bottom:5px; margin-top:5px; border-bottom:1px dashed #ccc; padding-bottom:5px;">
-                                <span><strong>1ª Restrição:</strong> ${dtPrim}</span>
-                                <span><strong>Última Restrição:</strong> ${dtUlt}</span>
-                            </div>
-                            <p style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; margin:0; width:100%; box-sizing:border-box;">${txtDefesa}</p>
-                         </div>`;
-            }
-        }
-
-        html += `<div style="margin-top:20px; border:1px solid #ddd; padding:10px; background:#f9f9f9;">
-                    <strong>PARECER DE VENDAS:</strong><br>
-                    <p style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; width:100%; box-sizing:border-box;">${parecer}</p>
-                 </div>`;
-
-        contentDiv.innerHTML = html;
-
-        const fileInput = document.getElementById('uploadSparta');
-        if (fileInput.files && fileInput.files.length > 0) {
-            imgDiv.innerHTML = '<h3>Anexos (Pesquisa Profunda SPARTA)</h3>';
-            const readFile = (file) => {
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result);
-                    reader.readAsDataURL(file);
+            if (totalPendencias > 7500.01) {
+                let somaRestricoes = 0;
+                let erroCamposTabela = false;
+                document.querySelectorAll('#tabelaRestricoes tbody tr').forEach(row => {
+                    const inputs = row.querySelectorAll('input');
+                    const val = limparValorMoeda(inputs[2].value);
+                    if (inputs[2].value !== "" && (inputs[0].value.trim() === "" || inputs[1].value.trim() === "")) erroCamposTabela = true;
+                    somaRestricoes += val;
                 });
-            };
-            for (let i = 0; i < fileInput.files.length; i++) {
-                const base64 = await readFile(fileInput.files[i]);
-                const imgTag = document.createElement('img');
-                imgTag.src = base64;
-                imgDiv.appendChild(imgTag);
+
+                if (erroCamposTabela) { alert("Preencha Fornecedor e Tipo para as restrições."); return; }
+                if (Math.abs(totalPendencias - somaRestricoes) > 0.01) { alert("Soma das restrições não bate com o total."); return; }
+
+                const txtDefesa = document.getElementById('textoDefesaRestricao').value.trim();
+                if (!document.getElementById('dataPrimeiraRestricao').value || !document.getElementById('dataUltimaRestricao').value) { alert("Preencha as datas das restrições."); return; }
+                if (txtDefesa.length < 100) { alert("Defesa deve ter no mínimo 100 caracteres."); return; }
             }
+
+            const reportDiv = document.getElementById('reportToImage');
+            const contentDiv = document.getElementById('reportContent');
+            const imgDiv = document.getElementById('reportImages');
+            contentDiv.innerHTML = ''; imgDiv.innerHTML = '';
+
+            const subtipo = document.getElementById('subTipoVenda').value;
+            const razao = document.getElementById('inpRazao').value || '-';
+            const lead = document.getElementById('inpLead').value || '-';
+            const lojas = document.getElementById('inpLojas').value || '-';
+            const segmento = document.getElementById('inputSegmento').value || '-';
+            const produto = document.getElementById('inpProduto').value || '-';
+            const foraAlcada = document.getElementById('selectForaAlcada').value;
+
+            let html = `<div class="rep-row"><span class="rep-label">Tipo:</span> <span class="rep-value">VENDAS (${subtipo})</span></div>
+                        <div class="rep-row"><span class="rep-label">Razão:</span> <span class="rep-value">${razao}</span></div>
+                        <div class="rep-row"><span class="rep-label">Lead:</span> <span class="rep-value">${lead}</span></div>
+                        <div class="rep-row"><span class="rep-label">Lojas:</span> <span class="rep-value">${lojas}</span></div>
+                        <div class="rep-row"><span class="rep-label">Seg:</span> <span class="rep-value">${segmento}</span></div>
+                        <div class="rep-row"><span class="rep-label">Prod:</span> <span class="rep-value">${produto}</span></div>
+                        <div class="rep-row"><span class="rep-label">Fora Alçada?</span> <span class="rep-value">${foraAlcada}</span></div>`;
+
+            if(foraAlcada === 'SIM') {
+                html += `<h3>Condições Especiais</h3><table class="rep-table"><thead><tr><th>Item</th><th>Valor</th><th>Alçada</th></tr></thead><tbody>`;
+                
+                document.querySelectorAll('#tabelaCondicoesBase tbody tr').forEach(tr => {
+                    const tds = tr.querySelectorAll('td');
+                    const item = tds[0].innerText.trim();
+                    let val = tds[1].querySelector('input') ? tds[1].querySelector('input').value : '';
+                    if(item.includes("Data")) val = formatarDataBR(val);
+                    let alc = tds[2].querySelector('select') ? tds[2].querySelector('select').value : '';
+                    if(alc !== "Aprovado") html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
+                });
+                
+                document.querySelectorAll('#tbodyAlcadaExtras tr').forEach(tr => {
+                    const tds = tr.querySelectorAll('td');
+                    let itemInput = tds[0].querySelector('input');
+                    let item = itemInput ? itemInput.value : tds[0].innerText.trim();
+                    let val = tds[1].querySelector('input').value;
+                    let alc = tds[2].querySelector('select').value;
+                    if(item && alc !== "Aprovado") html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
+                });
+                html += `</tbody></table>`;
+
+                if(totalPendencias > 7500.01) {
+                    html += `<h4>Detalhamento Restrições</h4><table class="rep-table"><thead><tr><th>Forn.</th><th>Tipo</th><th>Valor</th></tr></thead><tbody>`;
+                    document.querySelectorAll('#tabelaRestricoes tbody tr').forEach(tr => {
+                        const inputs = tr.querySelectorAll('input');
+                        if(inputs[2].value) html += `<tr><td>${inputs[0].value}</td><td>${inputs[1].value}</td><td>R$ ${inputs[2].value}</td></tr>`;
+                    });
+                    html += `</tbody></table>`;
+                    const dt1 = formatarDataBR(document.getElementById('dataPrimeiraRestricao').value);
+                    const dt2 = formatarDataBR(document.getElementById('dataUltimaRestricao').value);
+                    html += `<div style="border:1px solid #e0c482; padding:8px; margin-top:10px;"><strong>DEFESA:</strong> (1ª: ${dt1} / Últ: ${dt2})<br>${document.getElementById('textoDefesaRestricao').value}</div>`;
+                }
+            }
+            html += `<div style="margin-top:20px; border:1px solid #ddd; padding:10px;"><strong>PARECER:</strong><br>${parecer}</div>`;
+            contentDiv.innerHTML = html;
+
+            const fileInput = document.getElementById('uploadSparta');
+            if (fileInput.files.length > 0) {
+                imgDiv.innerHTML = '<h3>Anexos</h3>';
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => { const img = document.createElement('img'); img.src = e.target.result; imgDiv.appendChild(img); };
+                    reader.readAsDataURL(fileInput.files[i]);
+                }
+            }
+
+            setTimeout(() => {
+                html2canvas(reportDiv, { scale: 1 }).then(canvas => {
+                    const out = document.getElementById('imgOutputContainer'); out.innerHTML = '';
+                    canvas.id = "finalCanvas"; canvas.style.maxWidth = "100%"; out.appendChild(canvas);
+                    document.getElementById('resultadoModal').style.display = 'block';
+                }).catch(e => alert("Erro ao renderizar imagem: " + e));
+            }, 800);
+        } catch(err) {
+            alert("Erro fatal no script: " + err.message);
+            console.error(err);
         }
-
-        setTimeout(() => {
-            html2canvas(reportDiv, { scale: 1 }).then(canvas => {
-                const outContainer = document.getElementById('imgOutputContainer');
-                outContainer.innerHTML = '';
-                canvas.id = "finalCanvas";
-                canvas.style.maxWidth = "100%";
-                canvas.style.height = "auto";
-                outContainer.appendChild(canvas);
-                document.getElementById('resultadoModal').style.display = 'block';
-            });
-        }, 500);
-    }
-
-    function copiarImagem() {
-        const canvas = document.getElementById('finalCanvas');
-        if(!canvas) return;
-        canvas.toBlob(blob => {
-            try {
-                const item = new ClipboardItem({ 'image/png': blob });
-                navigator.clipboard.write([item]).then(() => {
-                    alert('Imagem copiada para a área de transferência! Agora basta colar no e-mail (Ctrl+V).');
-                }).catch(err => { alert('Erro ao copiar. Use o botão direito do mouse na imagem.'); });
-            } catch (e) { alert('Seu navegador não suporta cópia automática.'); }
-        });
     }
 
     const defaultSegments = ["AGRONEGOCIO", "ALIMENTACAO", "AUTOMOTIVOS E NAUTICO", "CALCADOS E ACESSORIOS", "ELETRONICOS", "ENTRETENIMENTO", "INSTITUICOES DE ENSINO", "JOALHERIA E BIJOUTERIAS", "MAGAZINES E LOJAS DEPARTAMENTOS", "MAQUINAS E PECAS", "MATERIAL CONSTRUCAO E ACABAMENTO", "MOVEIS E DECORACAO", "OTICA E RELOJOARIA", "PRODUTOS DIVERSOS", "SAUDE E ESTETICA", "SERVICOS DIVERSOS", "TURISMO", "VESTUARIO"];
@@ -926,11 +778,11 @@
     window.onload = function() {
         carregarConfiguracoes();
         renderizarMenus();
-        // Inicializa o estado dos campos para garantir que iniciam travados se vazios
+        
+        // Inicialização Forçada de Estado
         verificarFaturamento();
         verificarDataCNPJ();
         verificarPendencias();
-        // Inicializa genéricos
         document.querySelectorAll('input[onkeyup*="verificarGenerico"]').forEach(input => verificarGenerico(input));
     };
 
@@ -939,7 +791,16 @@
         const storedAlcs = localStorage.getItem('ppi_alcadas');
         currentSegments = storedSegs ? JSON.parse(storedSegs) : [...defaultSegments];
         currentAlcadas = storedAlcs ? JSON.parse(storedAlcs) : [...defaultAlcadas];
+
+        // AUTO-CORREÇÃO CRÍTICA
+        const required = ["Aprovado", "CAPI", "Negado", "Alçada Regional", "Gerência Nacional de Negócios", "Vice - Presidência", "Presidência"];
+        let mudou = false;
+        required.forEach(req => {
+            if(!currentAlcadas.includes(req)) { currentAlcadas.unshift(req); mudou = true; }
+        });
+        if(mudou) localStorage.setItem('ppi_alcadas', JSON.stringify(currentAlcadas));
     }
+
     function renderizarMenus() {
         const segSelect = document.getElementById('inputSegmento');
         segSelect.innerHTML = '<option value="">Selecione...</option>';
@@ -951,8 +812,9 @@
             const valorAtual = select.value;
             select.innerHTML = ''; 
             currentAlcadas.forEach(alc => { let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); });
-            // Se já tinha valor e não está disabled, tenta manter. Se estiver disabled, a lógica específica vai sobrescrever.
-            if(currentAlcadas.includes(valorAtual)) select.value = valorAtual;
+            if(currentAlcadas.includes(valorAtual)) {
+                select.value = valorAtual;
+            }
         });
     }
     function abrirConfig() { document.getElementById('cfgSegmentos').value = currentSegments.join('\n'); document.getElementById('cfgAlcadas').value = currentAlcadas.join('\n'); document.getElementById('configModal').style.display = 'flex'; }
@@ -967,74 +829,8 @@
         renderizarMenus(); fecharConfig(); alert("Salvo!");
     }
     function resetarFabrica() { if(confirm("Resetar padrões?")) { localStorage.removeItem('ppi_segmentos'); localStorage.removeItem('ppi_alcadas'); location.reload(); } }
-
-    function mudarSecaoPrincipal() {
-        document.querySelectorAll('.section-content').forEach(el => el.style.display = 'none');
-        const tipo = document.getElementById('tipoSolicitacao').value;
-        if(tipo) document.getElementById('section-' + tipo).style.display = 'block';
-    }
-    function toggleAlcada() {
-        const val = document.getElementById('selectForaAlcada').value;
-        document.getElementById('boxAlcada').style.display = (val === 'SIM') ? 'block' : 'none';
-    }
-    
-    // --- LÓGICA DE ALÇADA AUTOMÁTICA DE PENDÊNCIAS ---
-    function verificarPendencias() {
-        const inputVal = limparValorMoeda(document.getElementById('inputPendencias').value);
-        const detalheDiv = document.getElementById('formPendenciasDetalhe');
-        const tbody = document.querySelector('#tabelaRestricoes tbody');
-        const selAlcada = document.getElementById('selAlcadaPendencias');
-
-        // Exibição da tabela de detalhes
-        if (inputVal > 7500.01) { 
-            detalheDiv.style.display = 'block'; 
-            if(tbody.rows.length===0) adicionarLinhaRestricao(); 
-        } else { 
-            detalheDiv.style.display = 'none'; 
-        }
-
-        // Lógica de Alçada Automática
-        let novaAlcada = "Selecione...";
-        if (inputVal > 0) {
-            if (inputVal <= 7500.00) {
-                novaAlcada = "Aprovado";
-            } else if (inputVal <= 35000.00) {
-                novaAlcada = "Gerência Nacional de Negócios";
-            } else if (inputVal <= 70000.00) {
-                novaAlcada = "Vice - Presidência";
-            } else {
-                novaAlcada = "Presidência";
-            }
-        }
-        selAlcada.value = novaAlcada;
-    }
-
-    function adicionarLinhaRestricao() {
-        const tbody = document.querySelector('#tabelaRestricoes tbody');
-        const row = document.createElement('tr');
-        row.innerHTML = `<td><input type="text" placeholder="Fornecedor"></td><td><input type="text" placeholder="Tipo"></td><td><input type="text" placeholder="0,00" onkeyup="formatarMoedaInput(this)"></td><td style="text-align:center;"><button type="button" class="btn-remove-row" onclick="this.parentNode.parentNode.remove()">X</button></td>`;
-        tbody.appendChild(row);
-    }
-    function verificarDataCNPJ() {
-        const inputDateVal = document.getElementById('inputDataAbertura').value;
-        const selectAlcada = document.getElementById('selAlcadaData');
-        if (!inputDateVal) { selectAlcada.value = ""; selectAlcada.disabled = false; return; }
-        const dataAbertura = new Date(inputDateVal);
-        const dataLimite = new Date(); dataLimite.setFullYear(dataLimite.getFullYear() - 1);
-        if (dataAbertura < dataLimite) { selectAlcada.value = ""; selectAlcada.disabled = true; } else { selectAlcada.disabled = false; selectAlcada.value = "CAPI"; }
-    }
-    function adicionarLinhaAlcada() {
-        const tbody = document.getElementById('tbodyAlcadaExtras');
-        const row = document.createElement('tr');
-        const td1 = document.createElement('td'); td1.innerHTML = '<input type="text" placeholder="Item">';
-        const td2 = document.createElement('td'); td2.innerHTML = '<input type="text" placeholder="Valor">';
-        const td3 = document.createElement('td'); td3.className = 'flex-cell';
-        const select = document.createElement('select'); select.className = 'sel-alcada';
-        currentAlcadas.forEach(alc => { let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); });
-        const btnDel = document.createElement('button'); btnDel.type = 'button'; btnDel.textContent = 'X'; btnDel.className = 'btn-remove-row'; btnDel.onclick = function() { tbody.removeChild(row); };
-        td3.appendChild(select); td3.appendChild(btnDel);
-        row.appendChild(td1); row.appendChild(td2); row.appendChild(td3); tbody.appendChild(row);
-    }
+    function mudarSecaoPrincipal() { document.querySelectorAll('.section-content').forEach(el => el.style.display = 'none'); const tipo = document.getElementById('tipoSolicitacao').value; if(tipo) document.getElementById('section-' + tipo).style.display = 'block'; }
+    function toggleAlcada() { const val = document.getElementById('selectForaAlcada').value; document.getElementById('boxAlcada').style.display = (val === 'SIM') ? 'block' : 'none'; }
     function novaSolicitacao() { if(confirm("Limpar tudo?")) location.reload(); }
 </script>
 
