@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPI - Portal de Processos Interno</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #f4f4f4;
+            --border-color: #ddd;
+            --text-color: #333;
+            --success-color: #28a745;
+            --dark-color: #343a40;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* --- BOTÕES DO TOPO --- */
+        .top-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-reset {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        .btn-reset:hover { background-color: #218838; }
+
+        .btn-config {
+            background-color: var(--dark-color);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .btn-config:hover { background-color: #23272b; }
+
+        /* --- MODAL DE CONFIGURAÇÃO --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        textarea.config-area {
+            width: 100%;
+            height: 120px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .btn-save-config {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-close-modal {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .btn-reset-factory {
+            background-color: transparent;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn-reset-factory:hover { background-color: #dc3545; color: white; }
+
+        /* --- ESTILOS GERAIS --- */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            padding-top: 20px;
+        }
+
+        h1 { color: var(--primary-color); margin: 0; }
+        h2, h3 { color: #444; margin-top: 20px; }
+        h4 { margin: 0 0 10px 0; color: var(--primary-color); }
+
+        .form-group { margin-bottom: 15px; }
+
+        label { display: block; margin-bottom: 5px; font-weight: 600; }
+
+        input[type="text"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .section-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: #fafafa;
+            margin-top: 15px;
+            animation: fadeIn 0.5s;
+        }
+
+        .alcada-container {
+            display: none;
+            margin-top: 20px;
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #ccc;
+        }
+
+        .alcada-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .alcada-table th, .alcada-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .alcada-table th { background-color: var(--primary-color); color: white; }
+
+        /* Estilos específicos para a tabela dinâmica de restrições */
+        .sub-form-alert {
+            display: none;
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+
+        .restricao-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            background-color: white;
+        }
+        .restricao-table th, .restricao-table td {
+            border: 1px solid #e0c482; /* Cor amarelada para combinar */
+            padding: 8px;
+            text-align: left;
+        }
+        .restricao-table th {
+            background-color: #ffecb5;
+            color: #856404;
+        }
+
+        .btn-add-row {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-remove-row {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        button.btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        button.btn-submit:hover { background-color: #004494; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-buttons">
+        <button class="btn-config" onclick="abrirConfig()" title="Configurações">⚙️</button>
+        <button class="btn-reset" onclick="novaSolicitacao()" title="Limpar formulário">↻ NOVA SOLICITAÇÃO</button>
+    </div>
+
+    <header>
+        <h1>PPI - Portal de Processos Interno</h1>
+        <p>Centralização de Vendas, Pós-Vendas e Administrativo</p>
+    </header>
+
+    <div class="form-group">
+        <label for="tipoSolicitacao">Tipo de Solicitação:</label>
+        <select id="tipoSolicitacao" onchange="mudarSecaoPrincipal()">
+            <option value="">-- Selecione --</option>
+            <option value="VENDAS">VENDAS</option>
+            <option value="POS_VENDAS">PÓS VENDAS</option>
+            <option value="ADMINISTRATIVO">ADMINISTRATIVO</option>
+        </select>
+    </div>
+
+    <div id="section-VENDAS" class="section-content">
+        <h2>Solicitação de Vendas</h2>
+        
+        <div class="form-group">
+            <label>Sub-tipo de Venda:</label>
+            <select id="subTipoVenda">
+                <option value="CAPI">CAPI DE VENDAS</option>
+                <option value="POC">POC DE VENDAS</option>
+            </select>
+        </div>
+
+        <h3>Dados do Cliente</h3>
+        <div class="form-group">
+            <label>Razão Social:</label>
+            <input type="text" placeholder="Digite a Razão Social">
+        </div>
+        <div class="form-group">
+            <label>Nome Fantasia:</label>
+            <input type="text" placeholder="Digite o Nome Fantasia">
+        </div>
+        <div class="form-group">
+            <label>Quantidade de Lojas:</label>
+            <input type="number" placeholder="0">
+        </div>
+
+        <div class="form-group">
+            <label>Segmento:</label>
+            <select id="inputSegmento">
+                <option value="">Carregando...</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Produto:</label>
+            <select>
+                <option value="MultiCheck">MultiCheck</option>
+                <option value="MultiCrediário">MultiCrediário</option>
+                <option value="PayCheck">PayCheck</option>
+            </select>
+        </div>
+
+        <hr>
+
+        <div class="form-group">
+            <label>Há condição fora da alçada do regional?</label>
+            <select id="selectForaAlcada" onchange="toggleAlcada()">
+                <option value="NAO">NÃO</option>
+                <option value="SIM">SIM</option>
+            </select>
+        </div>
+
+        <div id="boxAlcada" class="alcada-container">
+            <h3>Tabela de Condições Especiais</h3>
+            <table class="alcada-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">ITEM</th>
+                        <th style="width: 30%;">VALOR / DADO</th>
+                        <th style="width: 30%;">ALÇADA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Faturamento Presumido</td>
+                        <td><input type="text" placeholder="R$"></td>
+                        <td><select class="sel-alcada"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Data de Abertura CNPJ</td>
+                        <td><input type="date"></td>
+                        <td><select class="sel-alcada"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Pendências Financeiras (R$)</td>
+                        <td><input type="number" id="inputPendencias" placeholder="0.00" onkeyup="verificarPendencias()"></td>
+                        <td><select class="sel-alcada"></select></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div id="formPendenciasDetalhe" class="sub-form-alert">
+                <h4>Resumo das Restrições (> R$ 7.000,00)</h4>
+                <p style="font-size: 13px; color: #666; margin-top: -5px;">Liste abaixo todas as pendências que compõem o valor.</p>
+                
+                <table class="restricao-table" id="tabelaRestricoes">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Fornecedor</th>
+                            <th style="width: 30%;">Tipo de Restrição</th>
+                            <th style="width: 20%;">Valor (R$)</th>
+                            <th style="width: 10%;">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+                <button type="button" class="btn-add-row" onclick="adicionarLinhaRestricao()">+ Adicionar Linha</button>
+            </div>
+
+            <table class="alcada-table" style="margin-top:0; border-top:none;">
+                <tbody>
+                    <tr>
+                        <td style="width: 40%;">Taxas (IP)</td>
+                        <td style="width: 30%;"><input type="text"></td>
+                        <td style="width: 30%;"><select class="sel-alcada"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Taxas (Flat/A.M)</td>
+                        <td><input type="text"></td>
+                        <td><select class="sel-alcada"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Prazo de Acatamento</td>
+                        <td><input type="text"></td>
+                        <td><select class="sel-alcada"></select></td>
+                    </tr>
+                    <tr>
+                        <td>TAP/TGO</td>
+                        <td><input type="text"></td>
+                        <td><select class="sel-alcada"></select></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" placeholder="Outro Item (Digite o nome)"></td>
+                        <td><input type="text"></td>
+                        <td><select class="sel-alcada"></select></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button class="btn-submit">Enviar Solicitação de Vendas</button>
+    </div>
+
+    <div id="section-POS_VENDAS" class="section-content">
+        <h2>Pós Vendas</h2>
+        <p>Formulários de Pós Vendas seriam carregados aqui.</p>
+        <button class="btn-submit">Enviar Solicitação Pós Vendas</button>
+    </div>
+    <div id="section-ADMINISTRATIVO" class="section-content">
+        <h2>Administrativo</h2>
+        <p>Formulários Administrativos seriam carregados aqui.</p>
+        <button class="btn-submit">Enviar Solicitação Administrativa</button>
+    </div>
+</div>
+
+<div id="configModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Configurações do Sistema</h3>
+            <span style="cursor:pointer; font-size:20px;" onclick="fecharConfig()">×</span>
+        </div>
+        
+        <label>Lista de Segmentos (Um por linha):</label>
+        <textarea id="cfgSegmentos" class="config-area"></textarea>
+
+        <label>Lista de Alçadas (Um por linha):</label>
+        <textarea id="cfgAlcadas" class="config-area"></textarea>
+        
+        <p style="font-size: 12px; color: #666; margin-top: -10px;">* Alterações são salvas localmente neste navegador.</p>
+
+        <div class="modal-footer">
+            <button class="btn-reset-factory" onclick="resetarFabrica()">⚠ Restaurar Padrões de Fábrica</button>
+            <div>
+                <button class="btn-close-modal" onclick="fecharConfig()">Cancelar</button>
+                <button class="btn-save-config" onclick="salvarConfig()">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DADOS PADRÃO (FACTORY DEFAULTS) ---
+    const defaultSegments = [
+        "AGRONEGOCIO", "ALIMENTACAO", "AUTOMOTIVOS E NAUTICO", "CALCADOS E ACESSORIOS",
+        "ELETRONICOS", "ENTRETENIMENTO", "INSTITUICOES DE ENSINO", "JOALHERIA E BIJOUTERIAS",
+        "MAGAZINES E LOJAS DEPARTAMENTOS", "MAQUINAS E PECAS", "MATERIAL CONSTRUCAO E ACABAMENTO",
+        "MOVEIS E DECORACAO", "OTICA E RELOJOARIA", "PRODUTOS DIVERSOS", "SAUDE E ESTETICA",
+        "SERVICOS DIVERSOS", "TURISMO", "VESTUARIO"
+    ];
+
+    const defaultAlcadas = [
+        "Selecione...",
+        "Alçada Regional",
+        "Gerência Nacional de Negócios",
+        "Diretor Nacional",
+        "Negado",
+        "POC de Negócios"
+    ];
+
+    // --- VARIÁVEIS DE ESTADO ---
+    let currentSegments = [];
+    let currentAlcadas = [];
+
+    // --- INICIALIZAÇÃO ---
+    window.onload = function() {
+        carregarConfiguracoes();
+        renderizarMenus();
+    };
+
+    function carregarConfiguracoes() {
+        const storedSegs = localStorage.getItem('ppi_segmentos');
+        const storedAlcs = localStorage.getItem('ppi_alcadas');
+
+        currentSegments = storedSegs ? JSON.parse(storedSegs) : [...defaultSegments];
+        currentAlcadas = storedAlcs ? JSON.parse(storedAlcs) : [...defaultAlcadas];
+    }
+
+    function renderizarMenus() {
+        // Renderiza Segmentos
+        const segSelect = document.getElementById('inputSegmento');
+        segSelect.innerHTML = '<option value="">Selecione...</option>';
+        currentSegments.forEach(seg => {
+            let opt = document.createElement('option');
+            opt.value = seg;
+            opt.text = seg;
+            segSelect.appendChild(opt);
+        });
+
+        // Renderiza Alçadas
+        document.querySelectorAll('.sel-alcada').forEach(select => {
+            const valorAtual = select.value;
+            select.innerHTML = ''; 
+            currentAlcadas.forEach(alc => {
+                let opt = document.createElement('option');
+                opt.value = alc;
+                opt.text = alc;
+                select.appendChild(opt);
+            });
+            if(currentAlcadas.includes(valorAtual)) select.value = valorAtual;
+        });
+    }
+
+    // --- FUNÇÕES DO MODAL ---
+    function abrirConfig() {
+        document.getElementById('cfgSegmentos').value = currentSegments.join('\n');
+        document.getElementById('cfgAlcadas').value = currentAlcadas.join('\n');
+        document.getElementById('configModal').style.display = 'flex';
+    }
+
+    function fecharConfig() {
+        document.getElementById('configModal').style.display = 'none';
+    }
+
+    function salvarConfig() {
+        const rawSegs = document.getElementById('cfgSegmentos').value.split('\n').map(s => s.trim()).filter(s => s !== "");
+        const rawAlcs = document.getElementById('cfgAlcadas').value.split('\n').map(s => s.trim()).filter(s => s !== "");
+
+        if(rawSegs.length === 0 || rawAlcs.length === 0) {
+            alert("As listas não podem ficar vazias!");
+            return;
+        }
+
+        currentSegments = rawSegs;
+        currentAlcadas = rawAlcs;
+
+        localStorage.setItem('ppi_segmentos', JSON.stringify(currentSegments));
+        localStorage.setItem('ppi_alcadas', JSON.stringify(currentAlcadas));
+
+        renderizarMenus();
+        fecharConfig();
+        alert("Configurações salvas com sucesso!");
+    }
+
+    function resetarFabrica() {
+        if(confirm("ATENÇÃO: Isso apagará todas as edições de segmentos e alçadas que você salvou e voltará ao padrão original. Deseja continuar?")) {
+            localStorage.removeItem('ppi_segmentos');
+            localStorage.removeItem('ppi_alcadas');
+            location.reload();
+        }
+    }
+
+    // --- LÓGICA DE NEGÓCIO ---
+    function mudarSecaoPrincipal() {
+        document.querySelectorAll('.section-content').forEach(el => el.style.display = 'none');
+        const tipo = document.getElementById('tipoSolicitacao').value;
+        if(tipo) document.getElementById('section-' + tipo).style.display = 'block';
+    }
+
+    function toggleAlcada() {
+        const val = document.getElementById('selectForaAlcada').value;
+        document.getElementById('boxAlcada').style.display = (val === 'SIM') ? 'block' : 'none';
+    }
+
+    // LÓGICA DE PENDÊNCIAS DINÂMICAS
+    function verificarPendencias() {
+        const inputVal = document.getElementById('inputPendencias').value;
+        const detalheDiv = document.getElementById('formPendenciasDetalhe');
+        const tbody = document.querySelector('#tabelaRestricoes tbody');
+
+        if (inputVal > 7000) {
+            detalheDiv.style.display = 'block';
+            // Se estiver vazio, adiciona uma linha automaticamente para facilitar
+            if(tbody.rows.length === 0) {
+                adicionarLinhaRestricao();
+            }
+        } else {
+            detalheDiv.style.display = 'none';
+        }
+    }
+
+    function adicionarLinhaRestricao() {
+        const tbody = document.querySelector('#tabelaRestricoes tbody');
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <td><input type="text" placeholder="Nome do Fornecedor"></td>
+            <td><input type="text" placeholder="Ex: Protesto, Dívida"></td>
+            <td><input type="number" placeholder="0.00"></td>
+            <td style="text-align:center;">
+                <button type="button" class="btn-remove-row" onclick="removerLinhaRestricao(this)">X</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    function removerLinhaRestricao(btn) {
+        // Remove a linha (tr) que contém o botão clicado
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
+    function novaSolicitacao() {
+        if(confirm("Deseja limpar todos os dados e iniciar uma nova solicitação?")) {
+            location.reload();
+        }
+    }
+</script>
+
+</body>
+</html>
