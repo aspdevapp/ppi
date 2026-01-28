@@ -182,6 +182,20 @@
 
         .flex-cell { display: flex; align-items: center; }
 
+        .defesa-container {
+            margin-top: 15px;
+            border-top: 1px solid #e0c482;
+            padding-top: 15px;
+        }
+        .row-dates {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .col-date {
+            flex: 1;
+        }
+
         /* --- BOTÃO GERAR --- */
         button.btn-generate {
             background-color: var(--primary-color);
@@ -364,7 +378,7 @@
                 <tbody>
                     <tr>
                         <td>Faturamento Presumido</td>
-                        <td><input type="text" placeholder="R$"></td>
+                        <td><input type="text" id="inputFaturamento" placeholder="0,00" onkeyup="formatarMoedaInput(this)"></td>
                         <td><select class="sel-alcada"></select></td>
                     </tr>
                     <tr>
@@ -378,14 +392,15 @@
                     </tr>
                     <tr>
                         <td>Pendências Financeiras (R$)</td>
-                        <td><input type="number" id="inputPendencias" placeholder="0.00" onkeyup="verificarPendencias()"></td>
-                        <td><select class="sel-alcada"></select></td>
+                        <td><input type="text" id="inputPendencias" placeholder="0,00" onkeyup="formatarMoedaInput(this); verificarPendencias()"></td>
+                        <td><select class="sel-alcada" id="selAlcadaPendencias"></select></td>
                     </tr>
                 </tbody>
             </table>
             
             <div id="formPendenciasDetalhe" class="sub-form-alert">
-                <h4>Resumo das Restrições (> R$ 7.000,00)</h4>
+                <h4>Resumo das Restrições (> R$ 7.500,01)</h4>
+                <p style="font-size: 13px; color: #666; margin-top: -5px;">Liste abaixo todas as pendências que compõem o valor.</p>
                 <table class="restricao-table" id="tabelaRestricoes">
                     <thead>
                         <tr>
@@ -398,6 +413,24 @@
                     <tbody></tbody>
                 </table>
                 <button type="button" class="btn-add-row" onclick="adicionarLinhaRestricao()">+ Adicionar Linha</button>
+
+                <div class="defesa-container">
+                    <h5 style="margin: 0 0 10px 0; color: #856404;">Defesa das Restrições (Obrigatório > 100 caracteres)</h5>
+                    <div class="row-dates">
+                        <div class="col-date">
+                            <label>Data da Primeira Restrição:</label>
+                            <input type="date" id="dataPrimeiraRestricao">
+                        </div>
+                        <div class="col-date">
+                            <label>Data da Última Restrição:</label>
+                            <input type="date" id="dataUltimaRestricao">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Justificativa / Defesa:</label>
+                        <textarea id="textoDefesaRestricao" rows="3" placeholder="Descreva aqui a defesa relacionada às restrições informadas (Mínimo 100 caracteres)..."></textarea>
+                    </div>
+                </div>
             </div>
 
             <table class="alcada-table" style="margin-top:0; border-top:none;">
@@ -436,8 +469,8 @@
         </div>
 
         <div class="form-group" style="margin-top: 20px;">
-            <label for="observacoesVendas">Parecer de Vendas:</label>
-            <textarea id="observacoesVendas" rows="4" placeholder="Digite aqui o parecer de vendas..."></textarea>
+            <label for="observacoesVendas">Parecer de Vendas (Obrigatório > 100 caracteres):</label>
+            <textarea id="observacoesVendas" rows="4" placeholder="Digite aqui o parecer de vendas (Mínimo 100 caracteres)..."></textarea>
         </div>
 
         <div class="form-group" style="margin-top: 15px;">
@@ -488,31 +521,84 @@
 </div>
 
 <script>
+    // --- FUNÇÕES HELPER PARA FORMATAÇÃO BRASILEIRA ---
+    function formatarMoedaInput(element) {
+        let value = element.value.replace(/\D/g, "");
+        value = (value / 100).toFixed(2) + "";
+        value = value.replace(".", ",");
+        value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        element.value = value;
+    }
+
+    function limparValorMoeda(valorStr) {
+        if (!valorStr) return 0;
+        let limpo = valorStr.replace(/\./g, "").replace(",", ".");
+        return parseFloat(limpo) || 0;
+    }
+
+    function formatarDataBR(dataStr) {
+        if(!dataStr) return "-";
+        const partes = dataStr.split('-');
+        if(partes.length !== 3) return dataStr;
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
     async function gerarImagemResumo() {
-        // --- VALIDAÇÃO DE SOMA DAS RESTRIÇÕES (NOVO) ---
-        const totalPendencias = parseFloat(document.getElementById('inputPendencias').value) || 0;
+        // --- VALIDAÇÃO GERAL ---
+        const pendenciasStr = document.getElementById('inputPendencias').value;
+        const totalPendencias = limparValorMoeda(pendenciasStr);
         
-        // Só valida se o valor for maior que 7000 (quando a tabela aparece)
-        if (totalPendencias > 7000) {
+        const parecer = document.getElementById('observacoesVendas').value || '';
+        if(parecer.length < 100) {
+            alert(`ERRO DE VALIDAÇÃO:\n\nO campo 'Parecer de Vendas' deve ter no mínimo 100 caracteres.\nAtual: ${parecer.length} caracteres.`);
+            return;
+        }
+
+        // LIMITE ATUALIZADO: 7.500,01
+        if (totalPendencias > 7500.01) {
             let somaRestricoes = 0;
+            let erroCamposTabela = false;
             const rows = document.querySelectorAll('#tabelaRestricoes tbody tr');
             
             rows.forEach(row => {
                 const inputs = row.querySelectorAll('input');
-                // O valor é o terceiro input (index 2)
-                const val = parseFloat(inputs[2].value) || 0;
+                const fornecedor = inputs[0].value.trim();
+                const tipo = inputs[1].value.trim();
+                const valStr = inputs[2].value;
+                const val = limparValorMoeda(valStr);
+
+                if (valStr !== "" && (fornecedor === "" || tipo === "")) {
+                    erroCamposTabela = true;
+                }
                 somaRestricoes += val;
             });
 
-            // Arredonda para 2 casas decimais para evitar erro de ponto flutuante
+            if (erroCamposTabela) {
+                alert("ERRO DE VALIDAÇÃO (TABELA):\n\nPara cada restrição com valor, preencha 'Fornecedor' e 'Tipo'.");
+                return;
+            }
+
             const diff = Math.abs(totalPendencias - somaRestricoes);
-            
             if (diff > 0.01) {
-                alert(`ERRO DE VALIDAÇÃO:\n\nO valor total de Pendências Financeiras informado (R$ ${totalPendencias.toFixed(2)}) NÃO bate com a soma das linhas de restrições (R$ ${somaRestricoes.toFixed(2)}).\n\nPor favor, corrija os valores antes de gerar a solicitação.`);
-                return; // Para a execução
+                alert(`ERRO DE SOMA:\n\nTotal Pendências: R$ ${totalPendencias.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\nSoma Restrições: R$ ${somaRestricoes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}\n\nAjuste os valores.`);
+                return; 
+            }
+
+            const dtPrim = document.getElementById('dataPrimeiraRestricao').value;
+            const dtUlt = document.getElementById('dataUltimaRestricao').value;
+            const txtDefesa = document.getElementById('textoDefesaRestricao').value.trim();
+
+            if (!dtPrim || !dtUlt) {
+                alert("ERRO DE VALIDAÇÃO (DATAS):\n\nPreencha as Datas da Primeira e Última Restrição.");
+                return;
+            }
+
+            if (txtDefesa.length < 100) {
+                alert(`ERRO DE VALIDAÇÃO (DEFESA):\n\nA 'Justificativa / Defesa' deve ter no mínimo 100 caracteres.\nAtual: ${txtDefesa.length} caracteres.`);
+                return;
             }
         }
-        // -----------------------------------------------
+        // -----------------------
 
         const reportDiv = document.getElementById('reportToImage');
         const contentDiv = document.getElementById('reportContent');
@@ -528,8 +614,7 @@
         const segmento = document.getElementById('inputSegmento').value || '-';
         const produto = document.getElementById('inpProduto').value || '-';
         const foraAlcada = document.getElementById('selectForaAlcada').value;
-        const parecer = document.getElementById('observacoesVendas').value || 'Nenhum parecer informado.';
-
+        
         let html = `
             <div class="rep-row"><span class="rep-label">Tipo de Solicitação:</span> <span class="rep-value">VENDAS (${subtipo})</span></div>
             <div class="rep-row"><span class="rep-label">Razão Social:</span> <span class="rep-value">${razao}</span></div>
@@ -551,6 +636,11 @@
                 const tds = tr.querySelectorAll('td');
                 const item = tds[0].innerText.trim();
                 let val = tds[1].querySelector('input') ? tds[1].querySelector('input').value : '';
+                
+                if(item.includes("Data")) {
+                    val = formatarDataBR(val);
+                }
+
                 let alc = tds[2].querySelector('select') ? tds[2].querySelector('select').value : '';
                 html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
             });
@@ -566,23 +656,39 @@
 
             html += `</tbody></table>`;
 
+            // LIMITE ATUALIZADO: 7.500,01
             const rowsRestr = document.querySelectorAll('#tabelaRestricoes tbody tr');
-            if(rowsRestr.length > 0) {
-                 html += `<h4>Detalhamento de Restrições (> R$ 7k)</h4>
+            if(totalPendencias > 7500.01 && rowsRestr.length > 0) {
+                 html += `<h4>Detalhamento de Restrições (> R$ 7.500,01)</h4>
                           <table class="rep-table" style="border-color:#e0c482">
                             <thead><tr style="background:#ffecb5; color:#856404"><th>Fornecedor</th><th>Restrição</th><th>Valor</th></tr></thead>
                             <tbody>`;
                  rowsRestr.forEach(tr => {
                     const inputs = tr.querySelectorAll('input');
-                    html += `<tr><td>${inputs[0].value}</td><td>${inputs[1].value}</td><td>R$ ${inputs[2].value}</td></tr>`;
+                    if(inputs[2].value) {
+                        html += `<tr><td>${inputs[0].value}</td><td>${inputs[1].value}</td><td>R$ ${inputs[2].value}</td></tr>`;
+                    }
                  });
                  html += `</tbody></table>`;
+
+                 const dtPrim = formatarDataBR(document.getElementById('dataPrimeiraRestricao').value);
+                 const dtUlt = formatarDataBR(document.getElementById('dataUltimaRestricao').value);
+                 const txtDefesa = document.getElementById('textoDefesaRestricao').value;
+
+                 html += `<div style="margin-top:10px; border:1px solid #e0c482; padding:8px; background:#fffbf0;">
+                            <strong>DEFESA DAS RESTRIÇÕES:</strong><br>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px; margin-top:5px; border-bottom:1px dashed #ccc; padding-bottom:5px;">
+                                <span><strong>1ª Restrição:</strong> ${dtPrim}</span>
+                                <span><strong>Última Restrição:</strong> ${dtUlt}</span>
+                            </div>
+                            <p style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; margin:0; width:100%; box-sizing:border-box;">${txtDefesa}</p>
+                         </div>`;
             }
         }
 
         html += `<div style="margin-top:20px; border:1px solid #ddd; padding:10px; background:#f9f9f9;">
                     <strong>PARECER DE VENDAS:</strong><br>
-                    <p style="white-space: pre-wrap;">${parecer}</p>
+                    <p style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; width:100%; box-sizing:border-box;">${parecer}</p>
                  </div>`;
 
         contentDiv.innerHTML = html;
@@ -631,9 +737,9 @@
         });
     }
 
-    // --- CONFIGURAÇÕES E DEMAIS FUNÇÕES ---
     const defaultSegments = ["AGRONEGOCIO", "ALIMENTACAO", "AUTOMOTIVOS E NAUTICO", "CALCADOS E ACESSORIOS", "ELETRONICOS", "ENTRETENIMENTO", "INSTITUICOES DE ENSINO", "JOALHERIA E BIJOUTERIAS", "MAGAZINES E LOJAS DEPARTAMENTOS", "MAQUINAS E PECAS", "MATERIAL CONSTRUCAO E ACABAMENTO", "MOVEIS E DECORACAO", "OTICA E RELOJOARIA", "PRODUTOS DIVERSOS", "SAUDE E ESTETICA", "SERVICOS DIVERSOS", "TURISMO", "VESTUARIO"];
-    const defaultAlcadas = ["Selecione...", "Alçada Regional", "Gerência Nacional de Negócios", "Diretor Nacional", "CAPI", "POC de Negócios", "Negado"];
+    // LISTA ATUALIZADA
+    const defaultAlcadas = ["Selecione...", "Aprovado", "Alçada Regional", "Gerência Nacional de Negócios", "Diretor Nacional", "Vice - Presidência", "Presidência", "CAPI", "POC de Negócios", "Negado"];
     let currentSegments = [], currentAlcadas = [];
 
     window.onload = function() { carregarConfiguracoes(); renderizarMenus(); };
@@ -680,16 +786,42 @@
         const val = document.getElementById('selectForaAlcada').value;
         document.getElementById('boxAlcada').style.display = (val === 'SIM') ? 'block' : 'none';
     }
+    
+    // --- LÓGICA DE VERIFICAÇÃO DE PENDÊNCIAS COM ALÇADA AUTOMÁTICA ---
     function verificarPendencias() {
-        const inputVal = document.getElementById('inputPendencias').value;
+        const inputVal = limparValorMoeda(document.getElementById('inputPendencias').value);
         const detalheDiv = document.getElementById('formPendenciasDetalhe');
         const tbody = document.querySelector('#tabelaRestricoes tbody');
-        if (inputVal > 7000) { detalheDiv.style.display = 'block'; if(tbody.rows.length===0) adicionarLinhaRestricao(); } else { detalheDiv.style.display = 'none'; }
+        const selAlcada = document.getElementById('selAlcadaPendencias');
+
+        // Regra de Exibição
+        if (inputVal > 7500.01) { 
+            detalheDiv.style.display = 'block'; 
+            if(tbody.rows.length===0) adicionarLinhaRestricao(); 
+        } else { 
+            detalheDiv.style.display = 'none'; 
+        }
+
+        // Regra de Alçada Automática
+        let novaAlcada = "Selecione...";
+        if (inputVal > 0) {
+            if (inputVal <= 7500.00) {
+                novaAlcada = "Aprovado";
+            } else if (inputVal <= 35000.00) {
+                novaAlcada = "Gerência Nacional de Negócios";
+            } else if (inputVal <= 70000.00) {
+                novaAlcada = "Vice - Presidência";
+            } else {
+                novaAlcada = "Presidência";
+            }
+        }
+        selAlcada.value = novaAlcada;
     }
+
     function adicionarLinhaRestricao() {
         const tbody = document.querySelector('#tabelaRestricoes tbody');
         const row = document.createElement('tr');
-        row.innerHTML = `<td><input type="text" placeholder="Fornecedor"></td><td><input type="text" placeholder="Tipo"></td><td><input type="number" placeholder="Valor"></td><td style="text-align:center;"><button type="button" class="btn-remove-row" onclick="this.parentNode.parentNode.remove()">X</button></td>`;
+        row.innerHTML = `<td><input type="text" placeholder="Fornecedor"></td><td><input type="text" placeholder="Tipo"></td><td><input type="text" placeholder="0,00" onkeyup="formatarMoedaInput(this)"></td><td style="text-align:center;"><button type="button" class="btn-remove-row" onclick="this.parentNode.parentNode.remove()">X</button></td>`;
         tbody.appendChild(row);
     }
     function verificarDataCNPJ() {
