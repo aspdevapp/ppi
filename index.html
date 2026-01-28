@@ -437,27 +437,27 @@
                 <tbody id="tbodyAlcadaExtras">
                     <tr>
                         <td style="width: 40%;">Taxas (IP)</td>
-                        <td style="width: 30%;"><input type="text"></td>
+                        <td style="width: 30%;"><input type="text" onkeyup="verificarGenerico(this)"></td>
                         <td style="width: 30%;"><select class="sel-alcada"></select></td>
                     </tr>
                     <tr>
                         <td>Taxas (Flat/A.M)</td>
-                        <td><input type="text"></td>
+                        <td><input type="text" onkeyup="verificarGenerico(this)"></td>
                         <td><select class="sel-alcada"></select></td>
                     </tr>
                     <tr>
                         <td>Prazo de Acatamento</td>
-                        <td><input type="text"></td>
+                        <td><input type="text" onkeyup="verificarGenerico(this)"></td>
                         <td><select class="sel-alcada"></select></td>
                     </tr>
                     <tr>
                         <td>TAP/TGO</td>
-                        <td><input type="text"></td>
+                        <td><input type="text" onkeyup="verificarGenerico(this)"></td>
                         <td><select class="sel-alcada"></select></td>
                     </tr>
                     <tr>
                         <td><input type="text" placeholder="Outro Item (Digite o nome)"></td>
-                        <td><input type="text"></td>
+                        <td><input type="text" onkeyup="verificarGenerico(this)"></td>
                         <td><select class="sel-alcada"></select></td>
                     </tr>
                 </tbody>
@@ -568,18 +568,37 @@
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
-    // --- NOVA FUNÇÃO: VERIFICA FATURAMENTO PRESUMIDO (ATUALIZADA) ---
+    // --- FUNÇÃO PARA CAMPOS GENÉRICOS (TAXAS, ETC) ---
+    function verificarGenerico(input) {
+        const row = input.closest('tr');
+        const select = row.querySelector('.sel-alcada');
+        if(!select) return;
+
+        const valStr = input.value.trim();
+        const valNum = limparValorMoeda(valStr);
+
+        // Se Vazio ou Zero -> Aprovado e Bloqueado
+        if (valStr === "" || valStr === "0,00" || valNum === 0) {
+            select.value = "Aprovado";
+            select.disabled = true;
+        } else {
+            select.disabled = false;
+        }
+    }
+
+    // --- FUNÇÃO FATURAMENTO ATUALIZADA (REGRA VAZIO/0 = APROVADO) ---
     function verificarFaturamento() {
         const produto = document.getElementById('inpProduto').value;
         const segmento = document.getElementById('inputSegmento').value;
         const faturamentoStr = document.getElementById('inputFaturamento').value;
         const selAlcada = document.getElementById('selAlcadaFaturamento');
+        const faturamentoVal = limparValorMoeda(faturamentoStr);
 
-        // Se campo de faturamento estiver vazio -> APROVADO (Bloqueado)
-        if (!faturamentoStr || faturamentoStr.trim() === "") {
+        // Se vazio ou 0,00 -> Aprovado e Bloqueado (REGRA GERAL)
+        if (!faturamentoStr || faturamentoStr.trim() === "" || faturamentoVal === 0) {
             selAlcada.value = "Aprovado";
             selAlcada.disabled = true;
-            selAlcada.title = "Campo de valor vazio: Aprovado automaticamente.";
+            selAlcada.title = "Campo de valor vazio ou zerado: Aprovado automaticamente.";
             return;
         }
 
@@ -589,7 +608,6 @@
              return;
         }
 
-        const faturamentoVal = limparValorMoeda(faturamentoStr);
         let limite = 0;
         if (faturamentoRules[produto] && faturamentoRules[produto][segmento]) {
             limite = faturamentoRules[produto][segmento];
@@ -599,11 +617,9 @@
             selAlcada.disabled = true;
             
             if (faturamentoVal < limite) {
-                // Inferior -> CAPI
                 selAlcada.value = "CAPI";
                 selAlcada.title = `Valor abaixo do limite para ${segmento} (R$ ${limite.toLocaleString('pt-BR')})`;
             } else {
-                // Superior ou igual -> Aprovado
                 selAlcada.value = "Aprovado";
                 selAlcada.title = `Valor dentro do limite para ${segmento} (R$ ${limite.toLocaleString('pt-BR')})`;
             }
@@ -613,35 +629,97 @@
         }
     }
 
-    // --- NOVA FUNÇÃO: VERIFICAR DATA CNPJ (REVISADA) ---
-    function verificarDataCNPJ() {
-        const inputDateVal = document.getElementById('inputDataAbertura').value;
-        const selectAlcada = document.getElementById('selAlcadaData');
+    // --- LÓGICA DE ALÇADA AUTOMÁTICA DE PENDÊNCIAS (ATUALIZADA) ---
+    function verificarPendencias() {
+        const inputValStr = document.getElementById('inputPendencias').value;
+        const inputVal = limparValorMoeda(inputValStr);
+        const detalheDiv = document.getElementById('formPendenciasDetalhe');
+        const tbody = document.querySelector('#tabelaRestricoes tbody');
+        const selAlcada = document.getElementById('selAlcadaPendencias');
 
-        if (!inputDateVal) {
-            selectAlcada.value = "";
-            selectAlcada.disabled = false;
+        // Exibição da tabela de detalhes (> 7500.01)
+        if (inputVal > 7500.01) { 
+            detalheDiv.style.display = 'block'; 
+            if(tbody.rows.length===0) adicionarLinhaRestricao(); 
+        } else { 
+            detalheDiv.style.display = 'none'; 
+        }
+
+        // Regra de Alçada: Se vazio ou 0 -> Aprovado e Bloqueado
+        if (!inputValStr || inputVal === 0) {
+            selAlcada.value = "Aprovado";
+            selAlcada.disabled = true;
             return;
         }
 
-        const dataAbertura = new Date(inputDateVal);
-        const dataLimite = new Date();
-        dataLimite.setFullYear(dataLimite.getFullYear() - 1);
-        dataAbertura.setHours(0,0,0,0);
-        dataLimite.setHours(0,0,0,0);
-
-        if (dataAbertura <= dataLimite) {
-            // >= 1 ano
-            selectAlcada.value = "Aprovado";
-            selectAlcada.disabled = true;
+        // Se tiver valor, aplica a lógica de faixas (e bloqueia também)
+        selAlcada.disabled = true; 
+        let novaAlcada = "Selecione...";
+        
+        if (inputVal <= 7500.00) {
+            novaAlcada = "Aprovado";
+        } else if (inputVal <= 35000.00) {
+            novaAlcada = "Gerência Nacional de Negócios";
+        } else if (inputVal <= 70000.00) {
+            novaAlcada = "Vice - Presidência";
         } else {
-            // < 1 ano
-            selectAlcada.value = "CAPI";
-            selectAlcada.disabled = true;
+            novaAlcada = "Presidência";
+        }
+        
+        selAlcada.value = novaAlcada;
+    }
+
+    function adicionarLinhaRestricao() {
+        const tbody = document.querySelector('#tabelaRestricoes tbody');
+        const row = document.createElement('tr');
+        row.innerHTML = `<td><input type="text" placeholder="Fornecedor"></td><td><input type="text" placeholder="Tipo"></td><td><input type="text" placeholder="0,00" onkeyup="formatarMoedaInput(this)"></td><td style="text-align:center;"><button type="button" class="btn-remove-row" onclick="this.parentNode.parentNode.remove()">X</button></td>`;
+        tbody.appendChild(row);
+    }
+
+    // --- DATA CNPJ (ATUALIZADA) ---
+    function verificarDataCNPJ() {
+        const inputDateVal = document.getElementById('inputDataAbertura').value;
+        const selectAlcada = document.getElementById('selAlcadaData');
+        
+        // Vazio -> Aprovado e Bloqueado (NOVA REGRA APLICADA)
+        if (!inputDateVal) { 
+            selectAlcada.value = "Aprovado"; 
+            selectAlcada.disabled = true; 
+            return; 
+        }
+
+        const dataAbertura = new Date(inputDateVal);
+        const dataLimite = new Date(); dataLimite.setFullYear(dataLimite.getFullYear() - 1); dataAbertura.setHours(0,0,0,0); dataLimite.setHours(0,0,0,0);
+        
+        if (dataAbertura <= dataLimite) { 
+            selectAlcada.value = "Aprovado"; 
+            selectAlcada.disabled = true; 
+        } else { 
+            selectAlcada.value = "CAPI"; 
+            selectAlcada.disabled = true; 
         }
     }
 
+    function adicionarLinhaAlcada() {
+        const tbody = document.getElementById('tbodyAlcadaExtras');
+        const row = document.createElement('tr');
+        const td1 = document.createElement('td'); td1.innerHTML = '<input type="text" placeholder="Item">';
+        const td2 = document.createElement('td'); td2.innerHTML = '<input type="text" placeholder="Valor" onkeyup="verificarGenerico(this)">';
+        const td3 = document.createElement('td'); td3.className = 'flex-cell';
+        const select = document.createElement('select'); select.className = 'sel-alcada';
+        
+        // Inicializa como Aprovado/Bloqueado
+        select.value = "Aprovado";
+        select.disabled = true;
+
+        currentAlcadas.forEach(alc => { let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); });
+        const btnDel = document.createElement('button'); btnDel.type = 'button'; btnDel.textContent = 'X'; btnDel.className = 'btn-remove-row'; btnDel.onclick = function() { tbody.removeChild(row); };
+        td3.appendChild(select); td3.appendChild(btnDel);
+        row.appendChild(td1); row.appendChild(td2); row.appendChild(td3); tbody.appendChild(row);
+    }
+
     async function gerarImagemResumo() {
+        // --- VALIDAÇÃO GERAL ---
         const pendenciasStr = document.getElementById('inputPendencias').value;
         const totalPendencias = limparValorMoeda(pendenciasStr);
         
@@ -694,6 +772,7 @@
                 return;
             }
         }
+        // -----------------------
 
         const reportDiv = document.getElementById('reportToImage');
         const contentDiv = document.getElementById('reportContent');
@@ -726,31 +805,40 @@
                         <thead><tr><th>Item</th><th>Valor/Dado</th><th>Alçada</th></tr></thead>
                         <tbody>`;
             
+            // --- LOOP BASE ---
             const rowsBase = document.querySelectorAll('#tabelaCondicoesBase tbody tr');
             rowsBase.forEach(tr => {
                 const tds = tr.querySelectorAll('td');
                 const item = tds[0].innerText.trim();
                 let val = tds[1].querySelector('input') ? tds[1].querySelector('input').value : '';
                 
-                if(item.includes("Data")) {
-                    val = formatarDataBR(val);
-                }
+                if(item.includes("Data")) val = formatarDataBR(val);
 
                 let alc = tds[2].querySelector('select') ? tds[2].querySelector('select').value : '';
-                html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
+                
+                // NOVO FILTRO: Se não for "Aprovado", mostra na imagem
+                if (alc !== "Aprovado") {
+                    html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
+                }
             });
 
+            // --- LOOP EXTRAS ---
             const rowsExtra = document.querySelectorAll('#tbodyAlcadaExtras tr');
             rowsExtra.forEach(tr => {
                 const tds = tr.querySelectorAll('td');
                 let item = tds[0].querySelector('input') ? tds[0].querySelector('input').value : (tds[0].innerText.trim());
                 let val = tds[1].querySelector('input') ? tds[1].querySelector('input').value : '';
                 let alc = tds[2].querySelector('select') ? tds[2].querySelector('select').value : '';
-                if(item) html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
+                
+                // NOVO FILTRO: Se não for "Aprovado", mostra na imagem
+                if(item && alc !== "Aprovado") {
+                    html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
+                }
             });
 
             html += `</tbody></table>`;
 
+            // LIMITE ATUALIZADO: 7.500,01
             const rowsRestr = document.querySelectorAll('#tabelaRestricoes tbody tr');
             if(totalPendencias > 7500.01 && rowsRestr.length > 0) {
                  html += `<h4>Detalhamento de Restrições (> R$ 7.500,01)</h4>
@@ -835,7 +923,16 @@
     const defaultAlcadas = ["Selecione...", "Aprovado", "Alçada Regional", "Gerência Nacional de Negócios", "Diretor Nacional", "Vice - Presidência", "Presidência", "CAPI", "POC de Negócios", "Negado"];
     let currentSegments = [], currentAlcadas = [];
 
-    window.onload = function() { carregarConfiguracoes(); renderizarMenus(); };
+    window.onload = function() {
+        carregarConfiguracoes();
+        renderizarMenus();
+        // Inicializa o estado dos campos para garantir que iniciam travados se vazios
+        verificarFaturamento();
+        verificarDataCNPJ();
+        verificarPendencias();
+        // Inicializa genéricos
+        document.querySelectorAll('input[onkeyup*="verificarGenerico"]').forEach(input => verificarGenerico(input));
+    };
 
     function carregarConfiguracoes() {
         const storedSegs = localStorage.getItem('ppi_segmentos');
@@ -854,6 +951,7 @@
             const valorAtual = select.value;
             select.innerHTML = ''; 
             currentAlcadas.forEach(alc => { let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); });
+            // Se já tinha valor e não está disabled, tenta manter. Se estiver disabled, a lógica específica vai sobrescrever.
             if(currentAlcadas.includes(valorAtual)) select.value = valorAtual;
         });
     }
@@ -922,8 +1020,8 @@
         const selectAlcada = document.getElementById('selAlcadaData');
         if (!inputDateVal) { selectAlcada.value = ""; selectAlcada.disabled = false; return; }
         const dataAbertura = new Date(inputDateVal);
-        const dataLimite = new Date(); dataLimite.setFullYear(dataLimite.getFullYear() - 1); dataAbertura.setHours(0,0,0,0); dataLimite.setHours(0,0,0,0);
-        if (dataAbertura <= dataLimite) { selectAlcada.value = "Aprovado"; selectAlcada.disabled = true; } else { selectAlcada.value = "CAPI"; selectAlcada.disabled = true; }
+        const dataLimite = new Date(); dataLimite.setFullYear(dataLimite.getFullYear() - 1);
+        if (dataAbertura < dataLimite) { selectAlcada.value = ""; selectAlcada.disabled = true; } else { selectAlcada.disabled = false; selectAlcada.value = "CAPI"; }
     }
     function adicionarLinhaAlcada() {
         const tbody = document.getElementById('tbodyAlcadaExtras');
