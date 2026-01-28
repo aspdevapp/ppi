@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPI - Portal de Processos Interno</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-color: #0056b3;
@@ -70,84 +71,6 @@
         }
         .btn-config:hover { background-color: #23272b; }
 
-        /* --- MODAL DE CONFIGURAÇÃO --- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            width: 500px;
-            max-width: 90%;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-
-        textarea.config-area {
-            width: 100%;
-            height: 120px;
-            font-family: monospace;
-            font-size: 12px;
-            margin-bottom: 15px;
-            resize: vertical;
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-
-        .btn-save-config {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .btn-close-modal {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-right: 5px;
-        }
-
-        .btn-reset-factory {
-            background-color: transparent;
-            color: #dc3545;
-            border: 1px solid #dc3545;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .btn-reset-factory:hover { background-color: #dc3545; color: white; }
-
         /* --- ESTILOS GERAIS --- */
         header {
             text-align: center;
@@ -173,7 +96,11 @@
             box-sizing: border-box;
         }
 
-        /* Estilo para campos desabilitados */
+        input[type="file"] {
+            background-color: white;
+            padding: 10px;
+        }
+
         select:disabled, input:disabled {
             background-color: var(--disabled-bg);
             color: #6c757d;
@@ -209,7 +136,6 @@
             padding: 8px;
             text-align: left;
         }
-
         .alcada-table th { background-color: var(--primary-color); color: white; }
 
         .sub-form-alert {
@@ -232,10 +158,7 @@
             padding: 8px;
             text-align: left;
         }
-        .restricao-table th {
-            background-color: #ffecb5;
-            color: #856404;
-        }
+        .restricao-table th { background-color: #ffecb5; color: #856404; }
 
         .btn-add-row {
             background-color: var(--success-color);
@@ -257,25 +180,97 @@
             margin-left: 5px;
         }
 
-        button.btn-submit {
+        .flex-cell { display: flex; align-items: center; }
+
+        /* --- BOTÃO GERAR --- */
+        button.btn-generate {
             background-color: var(--primary-color);
             color: white;
             padding: 15px 30px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: bold;
             width: 100%;
             margin-top: 20px;
-        }
-
-        button.btn-submit:hover { background-color: #004494; }
-
-        /* Utilitário Flex para a célula da tabela com botão remover */
-        .flex-cell {
             display: flex;
+            justify-content: center;
             align-items: center;
+            gap: 10px;
         }
+        button.btn-generate:hover { background-color: #004494; }
+
+        /* --- ÁREA DE RESULTADO (MODAL) --- */
+        #resultadoModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .resultado-content {
+            background: #fff;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .btn-copy {
+            background-color: #17a2b8;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .btn-close-res {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+
+        /* --- ESTILO DO RELATÓRIO OCULTO --- */
+        #reportToImage {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 800px;
+            background: white;
+            padding: 40px;
+            font-family: Arial, sans-serif;
+            border: 1px solid #ccc;
+        }
+        
+        #reportToImage h2 { border-bottom: 2px solid #0056b3; color: #0056b3; padding-bottom: 10px; }
+        .rep-row { margin-bottom: 10px; display: flex; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .rep-label { font-weight: bold; width: 250px; color: #555; }
+        .rep-value { flex: 1; color: #000; font-weight: 500;}
+        
+        .rep-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 14px;}
+        .rep-table th, .rep-table td { border: 1px solid #999; padding: 6px; text-align: left; }
+        .rep-table th { background-color: #0056b3; color: white; }
+
+        .rep-images img { max-width: 100%; margin-top: 10px; border: 1px solid #ccc; padding: 5px; display: block;}
+
+        /* MODAL DE CONFIGURAÇÃO */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 500px; max-width: 90%; }
+        .modal-footer { display: flex; justify-content: space-between; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+        textarea.config-area { width: 100%; height: 120px; font-family: monospace; font-size: 12px; margin-bottom: 15px; resize: vertical; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -317,15 +312,17 @@
         <h3>Dados do Cliente</h3>
         <div class="form-group">
             <label>Razão Social:</label>
-            <input type="text" placeholder="Digite a Razão Social">
+            <input type="text" id="inpRazao" placeholder="Digite a Razão Social" oninput="this.value = this.value.toUpperCase()">
         </div>
+        
         <div class="form-group">
-            <label>Nome Fantasia:</label>
-            <input type="text" placeholder="Digite o Nome Fantasia">
+            <label>Nome do Lead (Sparta):</label>
+            <input type="text" id="inpLead" placeholder="Nome igual do SPARTA" oninput="this.value = this.value.toUpperCase()">
         </div>
+
         <div class="form-group">
             <label>Quantidade de Lojas:</label>
-            <input type="number" placeholder="0">
+            <input type="number" id="inpLojas" placeholder="0">
         </div>
 
         <div class="form-group">
@@ -337,7 +334,7 @@
 
         <div class="form-group">
             <label>Produto:</label>
-            <select>
+            <select id="inpProduto">
                 <option value="MultiCheck">MultiCheck</option>
                 <option value="MultiCrediário">MultiCrediário</option>
                 <option value="PayCheck">PayCheck</option>
@@ -356,7 +353,7 @@
 
         <div id="boxAlcada" class="alcada-container">
             <h3>Tabela de Condições Especiais</h3>
-            <table class="alcada-table">
+            <table class="alcada-table" id="tabelaCondicoesBase">
                 <thead>
                     <tr>
                         <th style="width: 40%;">ITEM</th>
@@ -389,7 +386,6 @@
             
             <div id="formPendenciasDetalhe" class="sub-form-alert">
                 <h4>Resumo das Restrições (> R$ 7.000,00)</h4>
-                <p style="font-size: 13px; color: #666; margin-top: -5px;">Liste abaixo todas as pendências que compõem o valor.</p>
                 <table class="restricao-table" id="tabelaRestricoes">
                     <thead>
                         <tr>
@@ -439,269 +435,284 @@
             </div>
         </div>
 
-        <button class="btn-submit">Enviar Solicitação de Vendas</button>
+        <div class="form-group" style="margin-top: 20px;">
+            <label for="observacoesVendas">Parecer de Vendas:</label>
+            <textarea id="observacoesVendas" rows="4" placeholder="Digite aqui o parecer de vendas..."></textarea>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="uploadSparta">PESQUISA PROFUNDA (SPARTA):</label>
+            <input type="file" id="uploadSparta" accept="image/*" multiple>
+            <p style="font-size: 12px; color: #666; margin-top: 5px;">Selecione as imagens ou prints da pesquisa (Permite múltiplos arquivos).</p>
+        </div>
+
+        <button class="btn-generate" onclick="gerarImagemResumo()">📸 GERAR SOLICITAÇÃO DE VENDAS</button>
     </div>
 
     <div id="section-POS_VENDAS" class="section-content">
         <h2>Pós Vendas</h2>
-        <p>Formulários de Pós Vendas seriam carregados aqui.</p>
-        <button class="btn-submit">Enviar Solicitação Pós Vendas</button>
+        <button class="btn-generate">Gerar Solicitação</button>
     </div>
     <div id="section-ADMINISTRATIVO" class="section-content">
         <h2>Administrativo</h2>
-        <p>Formulários Administrativos seriam carregados aqui.</p>
-        <button class="btn-submit">Enviar Solicitação Administrativa</button>
+        <button class="btn-generate">Gerar Solicitação</button>
+    </div>
+</div>
+
+<div id="reportToImage">
+    <h2 style="text-align:center;">SOLICITAÇÃO DE VENDAS - PPI</h2>
+    <div id="reportContent"></div>
+    <div id="reportImages" class="rep-images"></div>
+</div>
+
+<div id="resultadoModal">
+    <div class="resultado-content">
+        <h3 style="color: var(--primary-color);">Solicitação Gerada com Sucesso!</h3>
+        <p>Abaixo está a imagem gerada. Clique em "Copiar Imagem" para colar no e-mail.</p>
+        <div id="imgOutputContainer" style="border: 1px solid #ccc; padding: 5px; margin-bottom: 10px; overflow-x: auto;"></div>
+        <button class="btn-copy" onclick="copiarImagem()">📋 Copiar Imagem</button>
+        <button class="btn-close-res" onclick="document.getElementById('resultadoModal').style.display='none'">Fechar</button>
     </div>
 </div>
 
 <div id="configModal" class="modal-overlay">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>Configurações do Sistema</h3>
-            <span style="cursor:pointer; font-size:20px;" onclick="fecharConfig()">×</span>
-        </div>
-        
-        <label>Lista de Segmentos (Um por linha):</label>
-        <textarea id="cfgSegmentos" class="config-area"></textarea>
-
-        <label>Lista de Alçadas (Um por linha):</label>
-        <textarea id="cfgAlcadas" class="config-area"></textarea>
-        
-        <p style="font-size: 12px; color: #666; margin-top: -10px;">* Alterações são salvas localmente neste navegador.</p>
-
+        <div class="modal-header"><h3>Configurações</h3><span style="cursor:pointer; font-size:20px;" onclick="fecharConfig()">×</span></div>
+        <label>Segmentos:</label><textarea id="cfgSegmentos" class="config-area"></textarea>
+        <label>Alçadas:</label><textarea id="cfgAlcadas" class="config-area"></textarea>
         <div class="modal-footer">
-            <button class="btn-reset-factory" onclick="resetarFabrica()">⚠ Restaurar Padrões de Fábrica</button>
-            <div>
-                <button class="btn-close-modal" onclick="fecharConfig()">Cancelar</button>
-                <button class="btn-save-config" onclick="salvarConfig()">Salvar Alterações</button>
-            </div>
+            <button class="btn-reset-factory" onclick="resetarFabrica()">Restaurar Padrões</button>
+            <div><button onclick="fecharConfig()" style="margin-right:5px; padding:5px;">Cancelar</button><button onclick="salvarConfig()" style="padding:5px;">Salvar</button></div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- DADOS PADRÃO (FACTORY DEFAULTS) ---
-    const defaultSegments = [
-        "AGRONEGOCIO", "ALIMENTACAO", "AUTOMOTIVOS E NAUTICO", "CALCADOS E ACESSORIOS",
-        "ELETRONICOS", "ENTRETENIMENTO", "INSTITUICOES DE ENSINO", "JOALHERIA E BIJOUTERIAS",
-        "MAGAZINES E LOJAS DEPARTAMENTOS", "MAQUINAS E PECAS", "MATERIAL CONSTRUCAO E ACABAMENTO",
-        "MOVEIS E DECORACAO", "OTICA E RELOJOARIA", "PRODUTOS DIVERSOS", "SAUDE E ESTETICA",
-        "SERVICOS DIVERSOS", "TURISMO", "VESTUARIO"
-    ];
+    async function gerarImagemResumo() {
+        // --- VALIDAÇÃO DE SOMA DAS RESTRIÇÕES (NOVO) ---
+        const totalPendencias = parseFloat(document.getElementById('inputPendencias').value) || 0;
+        
+        // Só valida se o valor for maior que 7000 (quando a tabela aparece)
+        if (totalPendencias > 7000) {
+            let somaRestricoes = 0;
+            const rows = document.querySelectorAll('#tabelaRestricoes tbody tr');
+            
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                // O valor é o terceiro input (index 2)
+                const val = parseFloat(inputs[2].value) || 0;
+                somaRestricoes += val;
+            });
 
-    const defaultAlcadas = [
-        "Selecione...",
-        "Alçada Regional",
-        "Gerência Nacional de Negócios",
-        "Diretor Nacional",
-        "CAPI",
-        "POC de Negócios",
-        "Negado"
-    ];
+            // Arredonda para 2 casas decimais para evitar erro de ponto flutuante
+            const diff = Math.abs(totalPendencias - somaRestricoes);
+            
+            if (diff > 0.01) {
+                alert(`ERRO DE VALIDAÇÃO:\n\nO valor total de Pendências Financeiras informado (R$ ${totalPendencias.toFixed(2)}) NÃO bate com a soma das linhas de restrições (R$ ${somaRestricoes.toFixed(2)}).\n\nPor favor, corrija os valores antes de gerar a solicitação.`);
+                return; // Para a execução
+            }
+        }
+        // -----------------------------------------------
 
-    // --- VARIÁVEIS DE ESTADO ---
-    let currentSegments = [];
-    let currentAlcadas = [];
+        const reportDiv = document.getElementById('reportToImage');
+        const contentDiv = document.getElementById('reportContent');
+        const imgDiv = document.getElementById('reportImages');
+        
+        contentDiv.innerHTML = '';
+        imgDiv.innerHTML = '';
 
-    // --- INICIALIZAÇÃO ---
-    window.onload = function() {
-        carregarConfiguracoes();
-        renderizarMenus();
-    };
+        const subtipo = document.getElementById('subTipoVenda').value;
+        const razao = document.getElementById('inpRazao').value || '-';
+        const lead = document.getElementById('inpLead').value || '-';
+        const lojas = document.getElementById('inpLojas').value || '-';
+        const segmento = document.getElementById('inputSegmento').value || '-';
+        const produto = document.getElementById('inpProduto').value || '-';
+        const foraAlcada = document.getElementById('selectForaAlcada').value;
+        const parecer = document.getElementById('observacoesVendas').value || 'Nenhum parecer informado.';
+
+        let html = `
+            <div class="rep-row"><span class="rep-label">Tipo de Solicitação:</span> <span class="rep-value">VENDAS (${subtipo})</span></div>
+            <div class="rep-row"><span class="rep-label">Razão Social:</span> <span class="rep-value">${razao}</span></div>
+            <div class="rep-row"><span class="rep-label">Lead (Sparta):</span> <span class="rep-value">${lead}</span></div>
+            <div class="rep-row"><span class="rep-label">Qtd. Lojas:</span> <span class="rep-value">${lojas}</span></div>
+            <div class="rep-row"><span class="rep-label">Segmento:</span> <span class="rep-value">${segmento}</span></div>
+            <div class="rep-row"><span class="rep-label">Produto:</span> <span class="rep-value">${produto}</span></div>
+            <div class="rep-row"><span class="rep-label">Fora da Alçada Regional?</span> <span class="rep-value">${foraAlcada}</span></div>
+        `;
+
+        if(foraAlcada === 'SIM') {
+            html += `<h3>Condições Especiais & Alçadas</h3>
+                     <table class="rep-table">
+                        <thead><tr><th>Item</th><th>Valor/Dado</th><th>Alçada</th></tr></thead>
+                        <tbody>`;
+            
+            const rowsBase = document.querySelectorAll('#tabelaCondicoesBase tbody tr');
+            rowsBase.forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                const item = tds[0].innerText.trim();
+                let val = tds[1].querySelector('input') ? tds[1].querySelector('input').value : '';
+                let alc = tds[2].querySelector('select') ? tds[2].querySelector('select').value : '';
+                html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
+            });
+
+            const rowsExtra = document.querySelectorAll('#tbodyAlcadaExtras tr');
+            rowsExtra.forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                let item = tds[0].querySelector('input') ? tds[0].querySelector('input').value : (tds[0].innerText.trim());
+                let val = tds[1].querySelector('input') ? tds[1].querySelector('input').value : '';
+                let alc = tds[2].querySelector('select') ? tds[2].querySelector('select').value : '';
+                if(item) html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
+            });
+
+            html += `</tbody></table>`;
+
+            const rowsRestr = document.querySelectorAll('#tabelaRestricoes tbody tr');
+            if(rowsRestr.length > 0) {
+                 html += `<h4>Detalhamento de Restrições (> R$ 7k)</h4>
+                          <table class="rep-table" style="border-color:#e0c482">
+                            <thead><tr style="background:#ffecb5; color:#856404"><th>Fornecedor</th><th>Restrição</th><th>Valor</th></tr></thead>
+                            <tbody>`;
+                 rowsRestr.forEach(tr => {
+                    const inputs = tr.querySelectorAll('input');
+                    html += `<tr><td>${inputs[0].value}</td><td>${inputs[1].value}</td><td>R$ ${inputs[2].value}</td></tr>`;
+                 });
+                 html += `</tbody></table>`;
+            }
+        }
+
+        html += `<div style="margin-top:20px; border:1px solid #ddd; padding:10px; background:#f9f9f9;">
+                    <strong>PARECER DE VENDAS:</strong><br>
+                    <p style="white-space: pre-wrap;">${parecer}</p>
+                 </div>`;
+
+        contentDiv.innerHTML = html;
+
+        const fileInput = document.getElementById('uploadSparta');
+        if (fileInput.files && fileInput.files.length > 0) {
+            imgDiv.innerHTML = '<h3>Anexos (Pesquisa Profunda SPARTA)</h3>';
+            const readFile = (file) => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+            };
+            for (let i = 0; i < fileInput.files.length; i++) {
+                const base64 = await readFile(fileInput.files[i]);
+                const imgTag = document.createElement('img');
+                imgTag.src = base64;
+                imgDiv.appendChild(imgTag);
+            }
+        }
+
+        setTimeout(() => {
+            html2canvas(reportDiv, { scale: 1 }).then(canvas => {
+                const outContainer = document.getElementById('imgOutputContainer');
+                outContainer.innerHTML = '';
+                canvas.id = "finalCanvas";
+                canvas.style.maxWidth = "100%";
+                canvas.style.height = "auto";
+                outContainer.appendChild(canvas);
+                document.getElementById('resultadoModal').style.display = 'block';
+            });
+        }, 500);
+    }
+
+    function copiarImagem() {
+        const canvas = document.getElementById('finalCanvas');
+        if(!canvas) return;
+        canvas.toBlob(blob => {
+            try {
+                const item = new ClipboardItem({ 'image/png': blob });
+                navigator.clipboard.write([item]).then(() => {
+                    alert('Imagem copiada para a área de transferência! Agora basta colar no e-mail (Ctrl+V).');
+                }).catch(err => { alert('Erro ao copiar. Use o botão direito do mouse na imagem.'); });
+            } catch (e) { alert('Seu navegador não suporta cópia automática.'); }
+        });
+    }
+
+    // --- CONFIGURAÇÕES E DEMAIS FUNÇÕES ---
+    const defaultSegments = ["AGRONEGOCIO", "ALIMENTACAO", "AUTOMOTIVOS E NAUTICO", "CALCADOS E ACESSORIOS", "ELETRONICOS", "ENTRETENIMENTO", "INSTITUICOES DE ENSINO", "JOALHERIA E BIJOUTERIAS", "MAGAZINES E LOJAS DEPARTAMENTOS", "MAQUINAS E PECAS", "MATERIAL CONSTRUCAO E ACABAMENTO", "MOVEIS E DECORACAO", "OTICA E RELOJOARIA", "PRODUTOS DIVERSOS", "SAUDE E ESTETICA", "SERVICOS DIVERSOS", "TURISMO", "VESTUARIO"];
+    const defaultAlcadas = ["Selecione...", "Alçada Regional", "Gerência Nacional de Negócios", "Diretor Nacional", "CAPI", "POC de Negócios", "Negado"];
+    let currentSegments = [], currentAlcadas = [];
+
+    window.onload = function() { carregarConfiguracoes(); renderizarMenus(); };
 
     function carregarConfiguracoes() {
         const storedSegs = localStorage.getItem('ppi_segmentos');
         const storedAlcs = localStorage.getItem('ppi_alcadas');
-
         currentSegments = storedSegs ? JSON.parse(storedSegs) : [...defaultSegments];
         currentAlcadas = storedAlcs ? JSON.parse(storedAlcs) : [...defaultAlcadas];
     }
-
     function renderizarMenus() {
         const segSelect = document.getElementById('inputSegmento');
         segSelect.innerHTML = '<option value="">Selecione...</option>';
-        currentSegments.forEach(seg => {
-            let opt = document.createElement('option');
-            opt.value = seg;
-            opt.text = seg;
-            segSelect.appendChild(opt);
-        });
-
+        currentSegments.forEach(seg => { let opt = document.createElement('option'); opt.value = seg; opt.text = seg; segSelect.appendChild(opt); });
+        populateAlcadas();
+    }
+    function populateAlcadas() {
         document.querySelectorAll('.sel-alcada').forEach(select => {
-            // Se o select for o dinâmico (criado depois), pode não ter opções ainda
-            // Mas esta função roda no onload.
             const valorAtual = select.value;
             select.innerHTML = ''; 
-            currentAlcadas.forEach(alc => {
-                let opt = document.createElement('option');
-                opt.value = alc;
-                opt.text = alc;
-                select.appendChild(opt);
-            });
+            currentAlcadas.forEach(alc => { let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); });
             if(currentAlcadas.includes(valorAtual)) select.value = valorAtual;
         });
     }
-
-    // --- FUNÇÕES DO MODAL ---
-    function abrirConfig() {
-        document.getElementById('cfgSegmentos').value = currentSegments.join('\n');
-        document.getElementById('cfgAlcadas').value = currentAlcadas.join('\n');
-        document.getElementById('configModal').style.display = 'flex';
-    }
-
-    function fecharConfig() {
-        document.getElementById('configModal').style.display = 'none';
-    }
-
+    function abrirConfig() { document.getElementById('cfgSegmentos').value = currentSegments.join('\n'); document.getElementById('cfgAlcadas').value = currentAlcadas.join('\n'); document.getElementById('configModal').style.display = 'flex'; }
+    function fecharConfig() { document.getElementById('configModal').style.display = 'none'; }
     function salvarConfig() {
-        const rawSegs = document.getElementById('cfgSegmentos').value.split('\n').map(s => s.trim()).filter(s => s !== "");
-        const rawAlcs = document.getElementById('cfgAlcadas').value.split('\n').map(s => s.trim()).filter(s => s !== "");
-
-        if(rawSegs.length === 0 || rawAlcs.length === 0) {
-            alert("As listas não podem ficar vazias!");
-            return;
-        }
-
-        currentSegments = rawSegs;
-        currentAlcadas = rawAlcs;
-
+        const rawSegs = document.getElementById('cfgSegmentos').value.split('\n').map(s=>s.trim()).filter(s=>s!=="");
+        const rawAlcs = document.getElementById('cfgAlcadas').value.split('\n').map(s=>s.trim()).filter(s=>s!=="");
+        if(rawSegs.length===0 || rawAlcs.length===0) return alert("Listas vazias!");
+        currentSegments = rawSegs; currentAlcadas = rawAlcs;
         localStorage.setItem('ppi_segmentos', JSON.stringify(currentSegments));
         localStorage.setItem('ppi_alcadas', JSON.stringify(currentAlcadas));
-
-        renderizarMenus();
-        fecharConfig();
-        alert("Configurações salvas com sucesso!");
+        renderizarMenus(); fecharConfig(); alert("Salvo!");
     }
+    function resetarFabrica() { if(confirm("Resetar padrões?")) { localStorage.removeItem('ppi_segmentos'); localStorage.removeItem('ppi_alcadas'); location.reload(); } }
 
-    function resetarFabrica() {
-        if(confirm("ATENÇÃO: Isso apagará todas as edições de segmentos e alçadas que você salvou e voltará ao padrão original. Deseja continuar?")) {
-            localStorage.removeItem('ppi_segmentos');
-            localStorage.removeItem('ppi_alcadas');
-            location.reload();
-        }
-    }
-
-    // --- LÓGICA DE NEGÓCIO ---
     function mudarSecaoPrincipal() {
         document.querySelectorAll('.section-content').forEach(el => el.style.display = 'none');
         const tipo = document.getElementById('tipoSolicitacao').value;
         if(tipo) document.getElementById('section-' + tipo).style.display = 'block';
     }
-
     function toggleAlcada() {
         const val = document.getElementById('selectForaAlcada').value;
         document.getElementById('boxAlcada').style.display = (val === 'SIM') ? 'block' : 'none';
     }
-
     function verificarPendencias() {
         const inputVal = document.getElementById('inputPendencias').value;
         const detalheDiv = document.getElementById('formPendenciasDetalhe');
         const tbody = document.querySelector('#tabelaRestricoes tbody');
-
-        if (inputVal > 7000) {
-            detalheDiv.style.display = 'block';
-            if(tbody.rows.length === 0) {
-                adicionarLinhaRestricao();
-            }
-        } else {
-            detalheDiv.style.display = 'none';
-        }
+        if (inputVal > 7000) { detalheDiv.style.display = 'block'; if(tbody.rows.length===0) adicionarLinhaRestricao(); } else { detalheDiv.style.display = 'none'; }
     }
-
     function adicionarLinhaRestricao() {
         const tbody = document.querySelector('#tabelaRestricoes tbody');
         const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><input type="text" placeholder="Nome do Fornecedor"></td>
-            <td><input type="text" placeholder="Ex: Protesto, Dívida"></td>
-            <td><input type="number" placeholder="0.00"></td>
-            <td style="text-align:center;">
-                <button type="button" class="btn-remove-row" onclick="removerLinha(this)">X</button>
-            </td>
-        `;
+        row.innerHTML = `<td><input type="text" placeholder="Fornecedor"></td><td><input type="text" placeholder="Tipo"></td><td><input type="number" placeholder="Valor"></td><td style="text-align:center;"><button type="button" class="btn-remove-row" onclick="this.parentNode.parentNode.remove()">X</button></td>`;
         tbody.appendChild(row);
     }
-
-    // Função genérica de remoção
-    function removerLinha(btn) {
-        const row = btn.parentNode.parentNode;
-        row.parentNode.removeChild(row);
-    }
-
     function verificarDataCNPJ() {
         const inputDateVal = document.getElementById('inputDataAbertura').value;
         const selectAlcada = document.getElementById('selAlcadaData');
-
-        if (!inputDateVal) {
-            selectAlcada.disabled = false;
-            selectAlcada.value = "";
-            return;
-        }
-
+        if (!inputDateVal) { selectAlcada.disabled = false; selectAlcada.value = ""; return; }
         const dataAbertura = new Date(inputDateVal);
-        const dataLimite = new Date();
-        dataLimite.setFullYear(dataLimite.getFullYear() - 1); 
-
-        // Se tem mais de 1 ano
-        if (dataAbertura < dataLimite) {
-            selectAlcada.value = ""; 
-            selectAlcada.disabled = true; 
-        } else {
-            // Se tem menos de 1 ano
-            selectAlcada.disabled = false; 
-            selectAlcada.value = "CAPI"; 
-        }
+        const dataLimite = new Date(); dataLimite.setFullYear(dataLimite.getFullYear() - 1);
+        if (dataAbertura < dataLimite) { selectAlcada.value = ""; selectAlcada.disabled = true; } else { selectAlcada.disabled = false; selectAlcada.value = "CAPI"; }
     }
-
-    // --- NOVA FUNÇÃO: ADICIONAR LINHA NA TABELA DE ALÇADA ---
     function adicionarLinhaAlcada() {
         const tbody = document.getElementById('tbodyAlcadaExtras');
         const row = document.createElement('tr');
-
-        // Coluna 1: Nome do Item
-        const td1 = document.createElement('td');
-        td1.innerHTML = '<input type="text" placeholder="Nome do Item">';
-
-        // Coluna 2: Valor
-        const td2 = document.createElement('td');
-        td2.innerHTML = '<input type="text" placeholder="Valor/Dado">';
-
-        // Coluna 3: Alçada (Select + Delete)
-        const td3 = document.createElement('td');
-        td3.className = 'flex-cell'; // Para alinhar o select e o botão
-
-        const select = document.createElement('select');
-        select.className = 'sel-alcada';
-        
-        // Popula o select com as opções atuais
-        currentAlcadas.forEach(alc => {
-            const opt = document.createElement('option');
-            opt.value = alc;
-            opt.text = alc;
-            select.appendChild(opt);
-        });
-
-        // Botão de deletar esta linha
-        const btnDel = document.createElement('button');
-        btnDel.type = 'button';
-        btnDel.textContent = 'X';
-        btnDel.className = 'btn-remove-row';
-        btnDel.onclick = function() { tbody.removeChild(row); };
-
-        td3.appendChild(select);
-        td3.appendChild(btnDel);
-
-        row.appendChild(td1);
-        row.appendChild(td2);
-        row.appendChild(td3);
-        tbody.appendChild(row);
+        const td1 = document.createElement('td'); td1.innerHTML = '<input type="text" placeholder="Item">';
+        const td2 = document.createElement('td'); td2.innerHTML = '<input type="text" placeholder="Valor">';
+        const td3 = document.createElement('td'); td3.className = 'flex-cell';
+        const select = document.createElement('select'); select.className = 'sel-alcada';
+        currentAlcadas.forEach(alc => { let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); });
+        const btnDel = document.createElement('button'); btnDel.type = 'button'; btnDel.textContent = 'X'; btnDel.className = 'btn-remove-row'; btnDel.onclick = function() { tbody.removeChild(row); };
+        td3.appendChild(select); td3.appendChild(btnDel);
+        row.appendChild(td1); row.appendChild(td2); row.appendChild(td3); tbody.appendChild(row);
     }
-
-    function novaSolicitacao() {
-        if(confirm("Deseja limpar todos os dados e iniciar uma nova solicitação?")) {
-            location.reload();
-        }
-    }
+    function novaSolicitacao() { if(confirm("Limpar tudo?")) location.reload(); }
 </script>
 
 </body>
