@@ -17,6 +17,10 @@
             --disabled-bg: #e9ecef;
             --email-color: #6f42c1;
             --btn-doc-color: #17a2b8;
+            
+            /* Cores Específicas do Diagnóstico */
+            --diag-blue: #3498db;
+            --diag-green: #27ae60;
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; padding: 20px; color: var(--text-color); }
@@ -35,9 +39,12 @@
 
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 600; }
-        input[type="text"], input[type="number"], input[type="date"], select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
-        input[type="file"] { background-color: white; padding: 10px; }
+        input[type="text"], input[type="number"], input[type="date"], input[type="email"], select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; }
+        input[type="file"] { background-color: white; padding: 10px; width: 100%; box-sizing: border-box; border: 1px solid var(--border-color); border-radius: 4px; }
         select:disabled, input:disabled { background-color: var(--disabled-bg); color: #6c757d; cursor: not-allowed; }
+        textarea { resize: vertical; }
+        
+        .input-erro { border-color: #dc3545 !important; box-shadow: 0 0 5px rgba(220, 53, 69, 0.3); }
 
         .section-content { display: none; padding: 20px; border: 1px solid var(--border-color); border-radius: 4px; background-color: #fafafa; margin-top: 15px; animation: fadeIn 0.5s; }
         .alcada-container { display: none; margin-top: 20px; background: #fff; padding: 15px; border: 1px solid #ccc; }
@@ -60,9 +67,8 @@
         .row-dates { display: flex; gap: 15px; margin-bottom: 10px; }
         .col-date { flex: 1; }
 
-        /* Botões Principais */
-        .btn-generate { background-color: var(--primary-color); color: white; padding: 15px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 18px; font-weight: bold; width: 100%; margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .btn-generate:hover { background-color: #004494; }
+        button.btn-generate { background-color: var(--primary-color); color: white; padding: 15px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 18px; font-weight: bold; width: 100%; margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        button.btn-generate:hover { background-color: #004494; }
         
         .btn-email-poc { background-color: var(--email-color); color: white; padding: 15px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 18px; font-weight: bold; width: 100%; margin-top: 20px; display: none; justify-content: center; align-items: center; gap: 10px; }
         .btn-email-poc:hover { background-color: #5a32a3; }
@@ -85,18 +91,43 @@
         .btn-email:hover { background-color: #5a32a3; }
         .btn-close-res { background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
 
-        /* RELATÓRIO OCULTO */
+        /* RELATÓRIO OCULTO VENDAS */
         #reportToImage { position: absolute; left: -9999px; top: 0; width: 800px; background: white; padding: 40px; font-family: Arial, sans-serif; border: 1px solid #ccc; box-sizing: border-box; }
         #reportToImage h2 { border-bottom: 2px solid #0056b3; color: #0056b3; padding-bottom: 10px; text-transform: uppercase; }
         .rep-row { margin-bottom: 10px; display: flex; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .rep-label { font-weight: bold; width: 250px; color: #555; }
         .rep-value { flex: 1; color: #000; font-weight: 500; }
-        
         .rep-table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 15px; font-size: 14px; }
         .rep-table th, .rep-table td { border: 1px solid #999; padding: 6px; text-align: left; }
         .rep-table th { background-color: #0056b3; color: white; }
-
         .rep-images img { max-width: 100%; margin-top: 10px; border: 1px solid #ccc; padding: 5px; display: block; }
+
+        /* RELATÓRIO OCULTO DIAGNÓSTICO */
+        #wrapper-oculto-diag { height: 0; overflow: hidden; position: absolute; width: 0; left: -9999px; }
+        #area-para-imagem-diag {
+            width: 600px; background: white; padding: 30px; border: 1px solid #e0e0e0; font-family: Arial, sans-serif;
+        }
+        .resumo-titulo-diag { color: #d9534f; margin-top: 0; border-bottom: 2px solid #d9534f; padding-bottom: 10px; font-size: 20px; font-weight: bold; }
+        
+        .tabela-resumo-diag { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; table-layout: fixed; }
+        .tabela-resumo-diag td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+        .tb-label-diag { font-weight: bold; color: #555; width: 35%; background-color: #f9f9f9; }
+        .tb-valor-diag { 
+            color: #000; 
+            width: 65%;
+            word-wrap: break-word; 
+            overflow-wrap: break-word; 
+            word-break: break-word; 
+        }
+        
+        .container-anexo-diag { margin-top: 20px; border-top: 2px dashed #ccc; padding-top: 15px; text-align: center; display: none; }
+        .container-anexo-diag img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .titulo-anexo-diag { font-weight: bold; color: #555; margin-bottom: 10px; display: block; text-align: left;}
+
+        /* Resultado Diagnostico dentro do form */
+        #resultado-container-diag { margin-top: 40px; display: none; border-top: 2px dashed #ccc; padding-top: 30px; text-align: center; }
+        #imagem-final-container-diag canvas { box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 4px; max-width: 100%; height: auto; margin-bottom: 10px;}
+        .instrucao-copiar { background-color: #e8f4fd; color: #1976d2; padding: 10px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #b3e5fc; font-size: 14px;}
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 25px; border-radius: 8px; width: 500px; max-width: 90%; }
@@ -138,11 +169,9 @@
                 <option value="POC">POC DE NEGÓCIOS</option>
             </select>
         </div>
-        
         <h3>Dados do Cliente</h3>
         <div class="form-group"><label>Razão Social:</label><input type="text" id="inpRazao" placeholder="Digite a Razão Social" oninput="this.value = this.value.toUpperCase()"></div>
         <div class="form-group"><label>Nome do Lead (Sparta):</label><input type="text" id="inpLead" placeholder="Nome igual do SPARTA" oninput="this.value = this.value.toUpperCase()"></div>
-        
         <div class="form-group">
             <label>Em que Estado o cliente fica localizado?</label>
             <select id="inpEstado">
@@ -156,7 +185,6 @@
                 <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
             </select>
         </div>
-
         <div class="form-group"><label>Produto:</label><select id="inpProduto" onchange="verificarFaturamento(); verificarPrazoAcatamento(); verificarCarencia()"><option value="MultiCheck">MultiCheck</option><option value="MultiCrediário">MultiCrediário</option><option value="PayCheck">PayCheck</option></select></div>
 
         <div id="containerCamposCAPI">
@@ -164,7 +192,6 @@
             <div class="form-group"><label>Segmento:</label><select id="inputSegmento" onchange="verificarFaturamento()"><option value="">Carregando...</option></select></div>
             <hr>
             <div class="form-group"><label>Há condição fora da alçada do regional?</label><select id="selectForaAlcada" onchange="toggleAlcada()"><option value="NAO">NÃO</option><option value="SIM">SIM</option></select></div>
-
             <div id="boxAlcada" class="alcada-container">
                 <h3>Tabela de Condições Especiais</h3>
                 <table class="alcada-table" id="tabelaCondicoesBase">
@@ -175,14 +202,10 @@
                         <tr><td>Pendências Financeiras (R$)</td><td><input type="text" id="inputPendencias" placeholder="0,00" onkeyup="formatarMoedaInput(this); verificarPendencias()"></td><td><select class="sel-alcada" id="selAlcadaPendencias"></select></td></tr>
                     </tbody>
                 </table>
-                
                 <div id="formPendenciasDetalhe" class="sub-form-alert">
                     <h4>Resumo das Restrições (> R$ 7.500,01)</h4>
                     <p style="font-size: 13px; color: #666; margin-top: -5px;">Liste abaixo todas as pendências que compõem o valor.</p>
-                    <table class="restricao-table" id="tabelaRestricoes">
-                        <thead><tr><th style="width: 40%;">Fornecedor</th><th style="width: 30%;">Tipo de Restrição</th><th style="width: 20%;">Valor (R$)</th><th style="width: 10%;">Ação</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
+                    <table class="restricao-table" id="tabelaRestricoes"><thead><tr><th style="width: 40%;">Fornecedor</th><th style="width: 30%;">Tipo de Restrição</th><th style="width: 20%;">Valor (R$)</th><th style="width: 10%;">Ação</th></tr></thead><tbody></tbody></table>
                     <button type="button" class="btn-add-row" onclick="adicionarLinhaRestricao()">+ Adicionar Linha</button>
                     <div class="defesa-container">
                         <h5 style="margin: 0 0 10px 0; color: #856404;">Defesa das Restrições (Obrigatório > 100 caracteres)</h5>
@@ -190,67 +213,107 @@
                         <div><label>Justificativa / Defesa:</label><textarea id="textoDefesaRestricao" rows="3" placeholder="Descreva aqui a defesa relacionada às restrições informadas (Mínimo 100 caracteres)..."></textarea></div>
                     </div>
                 </div>
-
                 <table class="alcada-table" style="margin-top:0; border-top:none;">
                     <tbody id="tbodyAlcadaExtras">
-                        <tr>
-                            <td style="width: 40%;">Taxas (IP)</td>
-                            <td style="width: 30%;"><input type="text" id="inputTaxaIP" value="0,00%" oninput="formatarPorcentagemInput(this, event); verificarTaxas()"></td>
-                            <td style="width: 30%;"><select class="sel-alcada" id="selAlcadaTaxaIP" onchange="verificarTaxas()"></select></td>
-                        </tr>
-                        <tr>
-                            <td>Taxas (Flat/A.M)</td>
-                            <td><input type="text" id="inputTaxaFlat" value="0,00%" oninput="formatarPorcentagemInput(this, event); verificarTaxas()"></td>
-                            <td><select class="sel-alcada" id="selAlcadaTaxaFlat" onchange="verificarTaxas()"></select></td>
-                        </tr>
-                        <tr>
-                            <td>Prazo de Acatamento</td>
-                            <td><input type="text" id="inputPrazo" onkeyup="verificarGenerico(this); verificarPrazoAcatamento()"></td>
-                            <td><select class="sel-alcada" id="selAlcadaPrazo"></select></td>
-                        </tr>
+                        <tr><td style="width: 40%;">Taxas (IP)</td><td style="width: 30%;"><input type="text" id="inputTaxaIP" value="0,00%" oninput="formatarPorcentagemInput(this, event); verificarTaxas()"></td><td style="width: 30%;"><select class="sel-alcada" id="selAlcadaTaxaIP" onchange="verificarTaxas()"></select></td></tr>
+                        <tr><td>Taxas (Flat/A.M)</td><td><input type="text" id="inputTaxaFlat" value="0,00%" oninput="formatarPorcentagemInput(this, event); verificarTaxas()"></td><td><select class="sel-alcada" id="selAlcadaTaxaFlat" onchange="verificarTaxas()"></select></td></tr>
+                        <tr><td>Prazo de Acatamento</td><td><input type="text" id="inputPrazo" onkeyup="verificarGenerico(this); verificarPrazoAcatamento()"></td><td><select class="sel-alcada" id="selAlcadaPrazo"></select></td></tr>
                         <tr><td>TAP/TGO</td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
-                        <tr>
-                            <td>Carência (OMC/Fat. Mín)</td>
-                            <td><input type="text" id="inputCarencia" onkeyup="verificarGenerico(this); verificarCarencia()"></td>
-                            <td><select class="sel-alcada" id="selAlcadaCarencia"></select></td>
-                        </tr>
-                        <tr>
-                            <td>Cliente é MEI?</td>
-                            <td><select id="selectMei" onchange="verificarMei()"><option value="NAO" selected>NÃO</option><option value="SIM">SIM</option></select></td>
-                            <td><select class="sel-alcada" id="selAlcadaMei"></select></td>
-                        </tr>
+                        <tr><td>Carência (OMC/Fat. Mín)</td><td><input type="text" id="inputCarencia" onkeyup="verificarGenerico(this); verificarCarencia()"></td><td><select class="sel-alcada" id="selAlcadaCarencia"></select></td></tr>
+                        <tr><td>Cliente é MEI?</td><td><select id="selectMei" onchange="verificarMei()"><option value="NAO" selected>NÃO</option><option value="SIM">SIM</option></select></td><td><select class="sel-alcada" id="selAlcadaMei"></select></td></tr>
                     </tbody>
                 </table>
-                
-                <div id="formDefesaTaxas" class="sub-form-alert" style="display:none;">
-                    <h4 id="tituloDefesaTaxas" style="color: #856404; margin-top: 0;">Justificativa de Taxas</h4>
-                    <div>
-                        <label>Defesa das taxas para Alçada (Obrigatório > 50 caracteres):</label>
-                        <textarea id="textoDefesaTaxas" rows="3" placeholder="Justifique a solicitação destas taxas especiais..."></textarea>
-                    </div>
-                </div>
-
+                <div id="formDefesaTaxas" class="sub-form-alert" style="display:none;"><h4 id="tituloDefesaTaxas" style="color: #856404; margin-top: 0;">Justificativa de Taxas</h4><div><label>Defesa das taxas para Alçada (Obrigatório > 50 caracteres):</label><textarea id="textoDefesaTaxas" rows="3" placeholder="Justifique a solicitação destas taxas especiais..."></textarea></div></div>
                 <div style="text-align: right; margin-top: 10px;"><button type="button" class="btn-add-row" onclick="adicionarLinhaAlcada()">+ Adicionar Item Personalizado</button></div>
             </div>
-
             <div class="form-group" style="margin-top: 20px;"><label for="observacoesVendas">Parecer de Vendas (Obrigatório > 100 caracteres):</label><textarea id="observacoesVendas" rows="4" placeholder="Digite aqui o parecer de vendas (Mínimo 100 caracteres)..."></textarea></div>
         </div>
+
         <div class="form-group" style="margin-top: 15px;"><label for="uploadSparta">PESQUISA PROFUNDA (SPARTA):</label><input type="file" id="uploadSparta" accept="image/*" multiple><p style="font-size: 12px; color: #666; margin-top: 5px;">Selecione as imagens ou prints da pesquisa (Permite múltiplos arquivos).</p></div>
-        
         <div id="containerBotoesPOC" class="poc-buttons-container">
             <a href="https://teledatainformac-my.sharepoint.com/:f:/g/personal/andre_pinheiro_comercialmulticredito_com_br/IgCh8knfrKrMQK-YEgfiU7fuAablXb1el3J4TiH7lv5OUgA?e=20OcAZ" target="_blank" class="btn-doc-poc">📄 Manual de POC de Negócios</a>
             <a href="https://teledatainformac-my.sharepoint.com/:f:/g/personal/andre_pinheiro_comercialmulticredito_com_br/IgCs588LnW9vQpCzDokZFRaCATV3Tz847MawZrRM3KUa9OE?e=LAJORs" target="_blank" class="btn-doc-poc">📊 Download Apresentação Padrão de POC</a>
         </div>
-
         <button id="btnGerarPadrao" class="btn-generate" onclick="gerarImagemResumo()">📸 GERAR SOLICITAÇÃO DE VENDAS</button>
         <button id="btnCriarEmailPOC" class="btn-email-poc" onclick="prepararEmail()">📧 CRIAR E-MAIL DE SOLICITAÇÃO</button>
     </div>
 
-    <div id="section-POS_VENDAS" class="section-content"><h2>Pós Vendas</h2><button class="btn-generate">Gerar Solicitação</button></div>
+    <div id="section-POS_VENDAS" class="section-content">
+        <h2>Solicitação de Pós Vendas</h2>
+        <div class="form-group">
+            <label>Sub-tipo de Pós Venda:</label>
+            <select id="subTipoPosVenda" onchange="verificarSubTipoPosVenda()">
+                <option value="">-- Selecione --</option>
+                <option value="CAPI_PV">CAPI DE PÓS VENDAS</option>
+                <option value="POC_PV">POC DE NEGÓCIOS PV</option>
+                <option value="CHECKLIST">CHECK LIST DE IMPLANTAÇÃO</option>
+                <option value="DIAGNOSTICO">DIAGNÓSTICO DE CANCELAMENTO</option>
+                <option value="LURI">ABERTURA DE CONTA LURI</option>
+                <option value="LINKS">LINKS ÚTEIS</option>
+            </select>
+        </div>
+        
+        <div id="containerConteudoPV">
+            <p id="msgPlaceholderPV" style="color: #666; text-align: center; margin-top: 20px;">Selecione um sub-tipo acima para carregar o formulário correspondente.</p>
+            
+            <div id="formDiagnosticoCancelamento" style="display: none; border-top: 2px dashed #ccc; margin-top: 20px; padding-top: 20px;">
+                <h3 style="color: var(--dark-color);">Preencha o Diagnóstico</h3>
+                <p style="color: #777; font-size: 14px; margin-bottom: 20px;">* Todos os campos são obrigatórios.</p>
+                <div class="form-group"><label for="diag_cod_razao">Código - Razão Social: * <small style="font-weight:normal; color:#888;">(Mínimo 6 dígitos)</small></label><input type="text" id="diag_cod_razao" placeholder="AAAA00 - MINHA EMPRESA LTDA" minlength="6" oninput="this.value = this.value.toUpperCase()"></div>
+                <div class="form-group"><label for="diag_email">E-mail para envio do termo: *</label><input type="email" id="diag_email" placeholder="ex: cliente@empresa.com.br"></div>
+                <div class="form-group" style="display: flex; gap: 20px;">
+                    <div style="flex: 1;"><label for="diag_data">Data para cancelamento: *</label><input type="date" id="diag_data"></div>
+                    <div style="flex: 1;"><label for="diag_ciente">Cliente ciente da nova fatura? *</label><select id="diag_ciente"><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
+                </div>
+                <div class="form-group"><label for="diag_descricao">Descrição da solicitação de cancelamento: *</label><textarea id="diag_descricao" rows="3" placeholder="O que motivou o cliente a pedir cancelamento foi..."></textarea></div>
+                <div class="form-group"><label for="diag_motivo">MOTIVO DO CANCELAMENTO (Resumido): *</label>
+                    <select id="diag_motivo" class="form-control">
+                        <option value="">Selecione uma opção...</option>
+                        <option value="1">1 - CLIENTE INADIMPLENTE NA TELECHEQUE</option><option value="2">2 - (T) MIGRACAO PARA OUTRO SERVICO TELECHEQUE</option><option value="3">3 - (T) CLIENTE NAO CONCORDA COM RENEGOCIACAO</option><option value="4">4 - (T) IMPLANTACAO NAO REALIZADA PELA TELECHEQUE</option><option value="6">6 - (C) QUALIDADE DO SERVICO INSATISFATORIA</option><option value="7">7 - (C) QUALIDADE DO ATENDIMENTO INSATISFATORIA</option><option value="8">8 - (C) MIGRACAO PARA CONCORRENCIA POR PRECO</option><option value="9">9 - PROBLEMAS ECONÔMICOS OU FINANCEIROS</option><option value="10">10 - ENCERRAMENTO DA ATIVIDADE COMERCIAL</option><option value="11">11 - (C) CLIENTE NAO CONCORDOU COM IMPLANTACAO</option><option value="13">13 - (C) PROBLEMAS COM RESSARCIMENTO</option><option value="14">14 - BAIXAS VENDAS COM CHEQUE</option><option value="20">20 - SUSPENSO AUTOMATICAMENTE POR ATRASO PAGAMENTO</option><option value="24">24 - MIGRACAO PARA GOODCHECK</option><option value="26">26 - FALTA DE ESCLARECIMENTO NA VENDAS</option><option value="27">27 - CLI NAO CONCORDOU IMPLANT- REPENSOU SOBRE PRODUTO</option><option value="28">28 - NAO ACATAMENTO DE CHEQUES-CONDICOES COMERCIAIS</option><option value="29">29 - MIGRACAO PARA CONCORRENCIA-POR PRODUTO</option><option value="34">34 - (C) OUTROS MOTIVOS</option><option value="35">35 - CANCELAMENTO DE USUÁRIO</option><option value="37">37 - (C) RISCO ELEVADO</option><option value="38">38 - ERRO DE GESTÃO DO PÓS-VENDAS</option><option value="39">39 - (C) AJUSTE ALTO</option><option value="41">41 - REDUÇÃO DE CUSTOS DO CLIENTE</option><option value="42">42 - (C) VOLUME CONT NAO EH ADEQUADO POTENCIAL CLIENTE</option><option value="45">45 - CLIENTE NÃO TRABALHA MAIS COM CHEQUE</option><option value="46">46 - MIGRAÇÃO PARA CONCORRÊNCIA POR QUALIDADE</option><option value="50">50 - EMPRESA VENDIDA SEM NOVA NEGOCIAÇÃO</option><option value="52">52 - (C) VENDA DA EMPRESA - MUDANCA SOCIETARIA</option><option value="53">53 - (C) NAO ATENDEMOS AS ESPECTATIVAS DO CLIENTE</option><option value="54">54 - (C) FALTA DE ACOMPANHAMENTO ADEQUADO</option><option value="56">56 - (C) ALTO INDICE DE NEGADOS</option><option value="57">57 - (C) CLIENTE COM DIRECIONAMENTO DE CHEQUES</option><option value="58">58 - NÃO ACATAMENTO DE CH SOMADO AO AJUSTE DE TAXA</option><option value="60">60 - (C) MIGRACAO P/ CONCORRENCIA - CARTAO/FINANCEIRA</option><option value="64">64 - DESENTENDIMENTO INTERNO ENTRE OS SÓCIOS</option><option value="66">66 - (C) SOLICITACAO DE DE X PARA</option><option value="67">67 - PROBLEMAS COM MEIO DE ACESSO</option><option value="71">71 - (T) CLIENTE COM BAIXA RENTABILIDADE</option><option value="72">72 - CONTRATO C/ MC NEGATIVA - CLIENTE NÃO ACEITOU RENEGOCIAÇÃO</option><option value="74">74 - CLIENTE NÃO ACEITA RESSARCIMENTO PARCIAL - SUST/ROUB</option><option value="75">75 - CLIENTE N ACEITA AJUSTE/RISCO ALTO</option><option value="76">76 - CLIENTE NÃO ACEITA OMC</option><option value="77">77 - CLIENTE NÃO ACEITA PRAZO DE ACATAMENTO</option><option value="80">80 - MIGRAÇÃO PARA CONCORRÊNCIA POR PREÇO</option><option value="81">81 - CLIENTE NÃO ACEITOU IMPLANTAÇÃO - PROB.NA VENDA</option><option value="83">83 - MIGRAÇÃO PARA FINANCEIRA</option><option value="84">84 - DEMORA NO ATENDIMENTO DO POS-VENDAS</option><option value="86">86 - EXPECTATIVA NAO ATENDIDA - VENDAS</option><option value="100">100 - CLIENTE INADIMPLENTE NA MULTI-CRÉDITO</option><option value="101">101 - CLIENTE COM BAIXAS VENDAS NO CREDIÁRIO</option><option value="102">102 - CLIENTE DEIXOU DE TRABALHAR COM CREDIÁRIO</option><option value="104">104 - CLIENTE SEM PERFIL</option><option value="105">105 - NÃO ACATAMENTO DE DUPLICATAS/ COND. COMERCIAIS</option><option value="111">111 - CANCELADO POR FRAUDE CLIENTE</option><option value="112">112 - EXPECTATIVA NÃO ATENDIDA - PRODUTO</option><option value="113">113 - CREDIARIO MUITO BUROCRATICO</option><option value="115">115 - TAXAS ALTAS</option><option value="118">118 - PROBLEMAS NA CADEIA DO CHEQUE</option><option value="120">120 - FALTA DE ESTRUTURA - EQUIPAMENTO</option><option value="122">122 - CUSTO VERSUS BENEFICIO</option><option value="123">123 - PROCESSO DO CHEQUE MUITO BUROCRATICO</option><option value="124">124 - CONSUMIDOR NAO ADERENTE AO MEIO DE PAGAM CHEQUE</option><option value="125">125 - QUEDA NAS VENDAS GERAL SITUACAO DE MERCADO</option><option value="126">126 - CLIENTE IMPLANTOU CREDIARIO PROPRIO</option><option value="128">128 - FALTA DE ANTECIPAÇÃO</option><option value="130">130 - ERRO DE VENDAS</option><option value="131">131 - CLIENTE NÃO ACEITA TARIFAS TAP/TGO</option><option value="132">132 - CONSUMIDOR NÃO ADERENTE AO MEIO DE PAGAMENTO CREDIÁRIO</option><option value="133">133 - PROBLEMAS COM INTEGRAÇAO BANCÁRIA</option><option value="134">134 - LIMITE DE CREDITO BAIXO PARA O CONSUMIDOR</option><option value="135">135 - MIGRAÇÃO PARA SERVIÇO METTADADOS</option><option value="904">904 - CANCELADO A PEDIDO DO CLIENTE</option><option value="909">909 - FALTA DE ANTECIPAÇÃO</option>
+                    </select>
+                </div>
+                <div class="form-group"><label for="diag_renegociacao">Por que a renegociação não deu certo? *</label><textarea id="diag_renegociacao" rows="3" placeholder="Quais foram as negativas do cliente para não aceitar a proposta de reversão..."></textarea></div>
+                <div class="form-group"><label for="diag_propostas">Propostas para reverter o resultado? *</label><textarea id="diag_propostas" rows="3" placeholder="Quais ações foram feitas para tentar reverter a intenção de cancelamento do contrato..."></textarea></div>
+                <div class="form-group" style="border-top: 1px solid #eee; padding-top: 20px;"><label for="diag_upload_imagem">Registro de Visita dos ultimos 120 dias</label><input type="file" id="diag_upload_imagem" accept="image/*"></div>
+                
+                <button class="btn-generate" onclick="gerarImagemDiagnostico()" style="background-color: var(--diag-blue);">GERAR DIAGNÓSTICO</button>
+
+                <div id="resultado-container-diag">
+                    <div id="imagem-final-container-diag"></div>
+                    <div class="action-buttons">
+                        <button class="btn-email" onclick="prepararEmailDiagnostico()" style="background-color: #e67e22;">Abrir E-mail e Colar</button>
+                        <button class="btn-copy" onclick="copiarImagemDiagnostico()" style="background-color: var(--diag-green);">Copiar Imagem</button>
+                    </div>
+                    <div class="instrucao-copiar" style="margin-top:10px;"><strong>Dica:</strong> Clique em "Abrir E-mail" para abrir o Outlook/App e depois pressione <strong>Ctrl+V</strong>.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="section-ADMINISTRATIVO" class="section-content"><h2>Administrativo</h2><button class="btn-generate">Gerar Solicitação</button></div>
 </div>
 
 <div id="reportToImage"><h2 style="text-align:center;">SOLICITAÇÃO DE VENDAS - PPI</h2><div id="reportContent"></div><div id="reportImages" class="rep-images"></div></div>
+
+<div id="wrapper-oculto-diag">
+    <div id="area-para-imagem-diag">
+        <h3 class="resumo-titulo-diag">Diagnóstico de Cancelamento</h3>
+        <table class="tabela-resumo-diag">
+            <tr><td class="tb-label-diag">Cód - Razão Social:</td><td class="tb-valor-diag" id="res-diag-cod-razao"></td></tr>
+            <tr><td class="tb-label-diag">E-mail envio termo:</td><td class="tb-valor-diag" id="res-diag-email"></td></tr>
+            <tr><td class="tb-label-diag">Data Cancelamento:</td><td class="tb-valor-diag" id="res-diag-data"></td></tr>
+            <tr><td class="tb-label-diag">Ciente Nova Fatura?</td><td class="tb-valor-diag" id="res-diag-ciente"></td></tr>
+            <tr><td class="tb-label-diag">Descrição Solicitação:</td><td class="tb-valor-diag" id="res-diag-descricao"></td></tr>
+            <tr><td class="tb-label-diag" style="color:#d9534f;">MOTIVO CANCELAMENTO:</td><td class="tb-valor-diag" id="res-diag-motivo" style="font-weight:bold;"></td></tr>
+            <tr><td class="tb-label-diag">Por que renegociação falhou?</td><td class="tb-valor-diag" id="res-diag-renegociacao"></td></tr>
+            <tr><td class="tb-label-diag">Propostas de Reversão:</td><td class="tb-valor-diag" id="res-diag-propostas"></td></tr>
+        </table>
+        <div id="container-anexo-diag" class="container-anexo-diag">
+            <span class="titulo-anexo-diag">Registro de Visita (120 dias):</span>
+            <img id="img-anexo-preview-diag" src="" alt="Imagem Anexada">
+        </div>
+    </div>
+</div>
 
 <div id="resultadoModal">
     <div class="resultado-content">
@@ -269,6 +332,9 @@
 <div id="configModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Configurações</h3><span style="cursor:pointer; font-size:20px;" onclick="fecharConfig()">×</span></div><label>Segmentos:</label><textarea id="cfgSegmentos" class="config-area"></textarea><label>Alçadas:</label><textarea id="cfgAlcadas" class="config-area"></textarea><div class="modal-footer"><button class="btn-reset-factory" onclick="resetarFabrica()">Restaurar Padrões</button><div><button onclick="fecharConfig()" style="margin-right:5px; padding:5px;">Cancelar</button><button onclick="salvarConfig()" style="padding:5px;">Salvar</button></div></div></div></div>
 
 <script>
+    // --------------------------------------------------------------------------------
+    // SCRIPT ORIGINAL (VENDAS E GERAL)
+    // --------------------------------------------------------------------------------
     const faturamentoRules = {"MultiCheck":{"AGRONEGOCIO":270000,"ALIMENTACAO":1000000,"AUTOMOTIVOS E NAUTICO":1000000,"CALCADOS E ACESSORIOS":135000,"COMBUSTIVEIS":1000000,"ELETRONICOS":1000000,"ENTRETENIMENTO":1000000,"INSTITUICOES DE ENSINO":345000,"JOALHERIA E BIJOUTERIAS":135000,"MAGAZINES E LOJAS DEPARTAMENTOS":220000,"MAQUINAS E PECAS":270000,"MATERIAL CONSTRUCAO E ACABAMENTO":1000000,"MOVEIS E DECORACAO":270000,"OTICA E RELOJOARIA":135000,"PRODUTOS DIVERSOS":1000000,"SAUDE E ESTETICA":900000,"SERVICOS DIVERSOS":220000,"TURISMO":1000000,"VESTUARIO":220000},"MultiCrediário":{"AGRONEGOCIO":270000,"ALIMENTACAO":1000000,"AUTOMOTIVOS E NAUTICO":1000000,"CALCADOS E ACESSORIOS":220000,"COMBUSTIVEIS":1000000,"ELETRONICOS":570000,"ENTRETENIMENTO":1000000,"INSTITUICOES DE ENSINO":545000,"JOALHERIA E BIJOUTERIAS":185000,"MAGAZINES E LOJAS DEPARTAMENTOS":220000,"MAQUINAS E PECAS":270000,"MATERIAL CONSTRUCAO E ACABAMENTO":270000,"MOVEIS E DECORACAO":270000,"OTICA E RELOJOARIA":220000,"PRODUTOS DIVERSOS":1000000,"SAUDE E ESTETICA":220000,"SERVICOS DIVERSOS":220000,"TURISMO":1000000,"VESTUARIO":220000},"PayCheck":{"AGRONEGOCIO":270000,"ALIMENTACAO":1000000,"AUTOMOTIVOS E NAUTICO":1000000,"CALCADOS E ACESSORIOS":220000,"COMBUSTIVEIS":1000000,"ELETRONICOS":570000,"ENTRETENIMENTO":1000000,"INSTITUICOES DE ENSINO":545000,"JOALHERIA E BIJOUTERIAS":185000,"MAGAZINES E LOJAS DEPARTAMENTOS":220000,"MAQUINAS E PECAS":270000,"MATERIAL CONSTRUCAO E ACABAMENTO":270000,"MOVEIS E DECORACAO":270000,"OTICA E RELOJOARIA":220000,"PRODUTOS DIVERSOS":1000000,"SAUDE E ESTETICA":220000,"SERVICOS DIVERSOS":220000,"TURISMO":1000000,"VESTUARIO":220000}};
 
     function formatarMoedaInput(element) {
@@ -334,16 +400,30 @@
         const selAlcada = document.getElementById('selAlcadaPrazo');
         const valor = parseInt(inputPrazo.value.replace(/\D/g, "")) || 0;
 
-        if (valor === 0) { selAlcada.value = "Aprovado"; selAlcada.disabled = true; return; }
+        if (valor === 0) {
+            selAlcada.value = "Aprovado";
+            selAlcada.disabled = true;
+            return;
+        }
 
         let limite = 9999;
-        if (produto === "MultiCrediário") { limite = 10; } 
-        else if (produto === "PayCheck" || produto === "MultiCheck") { limite = 30; }
+        if (produto === "MultiCrediário") {
+            limite = 10;
+        } else if (produto === "PayCheck" || produto === "MultiCheck") {
+            limite = 30;
+        }
 
-        if (valor > limite) { selAlcada.value = "CAPI"; selAlcada.disabled = true; } 
-        else { selAlcada.value = "Aprovado"; selAlcada.disabled = true; }
+        if (valor > limite) {
+            selAlcada.value = "CAPI";
+            selAlcada.disabled = true;
+        } else {
+            // REGRA NOVA: DENTRO DO LIMITE = APROVADO BLOQUEADO
+            selAlcada.value = "Aprovado";
+            selAlcada.disabled = true;
+        }
     }
 
+    // VERIFICAR CARÊNCIA
     function verificarCarencia() {
         const produto = document.getElementById('inpProduto').value;
         const inputCarencia = document.getElementById('inputCarencia');
@@ -353,7 +433,10 @@
         if (!produto) { selAlcada.disabled = false; return; }
         selAlcada.disabled = true;
 
-        if (valor === 0) { selAlcada.value = "Aprovado"; return; }
+        if (valor === 0) {
+            selAlcada.value = "Aprovado";
+            return;
+        }
 
         let isCapi = false;
         if (produto === "MultiCrediário" && valor > 2) { isCapi = true; } 
@@ -362,11 +445,16 @@
         selAlcada.value = isCapi ? "CAPI" : "Aprovado";
     }
 
+    // NOVA FUNÇÃO: VERIFICAR MEI
     function verificarMei() {
         const val = document.getElementById('selectMei').value;
         const alcada = document.getElementById('selAlcadaMei');
-        alcada.disabled = true; 
-        if (val === 'SIM') { alcada.value = 'CAPI'; } else { alcada.value = 'Aprovado'; }
+        alcada.disabled = true; // Sempre bloqueado
+        if (val === 'SIM') {
+            alcada.value = 'CAPI';
+        } else {
+            alcada.value = 'Aprovado';
+        }
     }
 
     function verificarFaturamento() {
@@ -492,6 +580,7 @@
         row.appendChild(td1); row.appendChild(td2); row.appendChild(td3); tbody.appendChild(row);
     }
 
+    // --- NOVA FUNÇÃO PARA ALTERNAR VISIBILIDADE ---
     function verificarSubTipo() {
         const subTipo = document.getElementById('subTipoVenda').value;
         const containerCAPI = document.getElementById('containerCamposCAPI');
@@ -511,6 +600,26 @@
             btnEmailPoc.style.display = 'none';
         }
         populateAlcadas();
+    }
+
+    // --- FUNÇÃO PÓS VENDA ---
+    function verificarSubTipoPosVenda() {
+        const select = document.getElementById('subTipoPosVenda');
+        const placeholder = document.getElementById('msgPlaceholderPV');
+        const formDiag = document.getElementById('formDiagnosticoCancelamento');
+
+        // Reseta tudo
+        placeholder.style.display = 'block';
+        formDiag.style.display = 'none';
+
+        if(select.value === 'DIAGNOSTICO') {
+            placeholder.style.display = 'none';
+            formDiag.style.display = 'block';
+        } else if (select.value) {
+            placeholder.innerText = "Formulário para: " + select.options[select.selectedIndex].text + " (Em construção...)";
+        } else {
+            placeholder.innerText = "Selecione um sub-tipo acima para carregar o formulário correspondente.";
+        }
     }
 
     async function prepararEmail() {
@@ -770,6 +879,133 @@ Abaixo Checklist da venda:
         link.href = canvas.toDataURL();
         link.click();
     }
+
+    // --------------------------------------------------------------------------------
+    // SCRIPTS DO DIAGNÓSTICO DE CANCELAMENTO
+    // --------------------------------------------------------------------------------
+    let canvasGlobalDiag = null;
+
+    document.getElementById('diag_cod_razao').addEventListener('input', function(e) {
+        let v = e.target.value.toUpperCase();
+        if (e.inputType !== 'deleteContentBackward') {
+            if (v.length > 6 && !v.includes(' - ')) { let codigo = v.substring(0, 6); let resto = v.substring(6); v = codigo + ' - ' + resto; }
+            else if (v.length === 6) { v = v + ' - '; }
+        }
+        e.target.value = v;
+    });
+
+    document.getElementById('diag_upload_imagem').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const containerAnexo = document.getElementById('container-anexo-diag');
+        const imgPreview = document.getElementById('img-anexo-preview-diag');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) { imgPreview.src = event.target.result; containerAnexo.style.display = 'block'; }
+            reader.readAsDataURL(file);
+        } else { imgPreview.src = ""; containerAnexo.style.display = 'none'; }
+    });
+
+    function validarFormularioDiagnostico() {
+        const idsObrigatorios = ['diag_cod_razao', 'diag_email', 'diag_data', 'diag_ciente', 'diag_descricao', 'diag_motivo', 'diag_renegociacao', 'diag_propostas'];
+        let formularioValido = true;
+        let primeiroCampoInvalido = null;
+
+        idsObrigatorios.forEach(id => {
+            const campo = document.getElementById(id);
+            campo.classList.remove('input-erro');
+            if (!campo.value || campo.value.trim() === "") {
+                formularioValido = false; campo.classList.add('input-erro');
+                if (primeiroCampoInvalido === null) primeiroCampoInvalido = campo;
+            }
+            if (id === 'diag_cod_razao' && campo.value.length < 6) {
+                formularioValido = false; campo.classList.add('input-erro');
+                if (primeiroCampoInvalido === null) primeiroCampoInvalido = campo;
+                alert("O Código deve possuir no mínimo 6 caracteres.");
+            }
+            if (id === 'diag_email' && campo.value.trim() !== "") {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(campo.value)) {
+                    formularioValido = false; campo.classList.add('input-erro');
+                    if (primeiroCampoInvalido === null) primeiroCampoInvalido = campo;
+                    alert("Insira um e-mail válido.");
+                }
+            }
+        });
+
+        if (!formularioValido && primeiroCampoInvalido) { alert("Preencha todos os campos obrigatórios."); primeiroCampoInvalido.focus(); }
+        return formularioValido;
+    }
+
+    function gerarImagemDiagnostico() {
+        if (!validarFormularioDiagnostico()) return;
+
+        const codRazao = document.getElementById('diag_cod_razao').value.toUpperCase();
+        const email = document.getElementById('diag_email').value;
+        let dataFormatada = "";
+        const dataInput = document.getElementById('diag_data').value;
+        if(dataInput) { const [ano, mes, dia] = dataInput.split('-'); dataFormatada = `${dia}/${mes}/${ano}`; }
+        
+        document.getElementById('res-diag-cod-razao').textContent = codRazao;
+        document.getElementById('res-diag-email').textContent = email;
+        document.getElementById('res-diag-data').textContent = dataFormatada;
+        document.getElementById('res-diag-ciente').textContent = document.getElementById('diag_ciente').value;
+        document.getElementById('res-diag-descricao').innerText = document.getElementById('diag_descricao').value;
+        const motivoSelect = document.getElementById('diag_motivo');
+        document.getElementById('res-diag-motivo').textContent = motivoSelect.options[motivoSelect.selectedIndex].text;
+        document.getElementById('res-diag-renegociacao').innerText = document.getElementById('diag_renegociacao').value;
+        document.getElementById('res-diag-propostas').innerText = document.getElementById('diag_propostas').value;
+
+        const resultadoContainer = document.getElementById('resultado-container-diag');
+        const imgContainer = document.getElementById('imagem-final-container-diag');
+        
+        resultadoContainer.style.display = 'block';
+        imgContainer.innerHTML = 'Gerando imagem... aguarde.';
+
+        html2canvas(document.querySelector("#area-para-imagem-diag"), {
+            scale: 2, backgroundColor: "#ffffff", useCORS: true, allowTaint: true
+        }).then(canvas => {
+            canvasGlobalDiag = canvas;
+            imgContainer.innerHTML = '';
+            canvas.style.width = '100%'; canvas.style.height = 'auto';
+            imgContainer.appendChild(canvas);
+            resultadoContainer.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    function copiarImagemDiagnostico() {
+        if (!canvasGlobalDiag) return;
+        canvasGlobalDiag.toBlob(function(blob) {
+            try {
+                const item = new ClipboardItem({ "image/png": blob });
+                navigator.clipboard.write([item]).then(() => { alert("Copiado! (Ctrl+V)"); });
+            } catch (e) { alert("Use o botão direito para copiar."); }
+        });
+    }
+
+    function prepararEmailDiagnostico() {
+        copiarImagemDiagnostico();
+        alert("Imagem copiada! Cole no e-mail (Ctrl+V).");
+        
+        const codRazao = document.getElementById('diag_cod_razao').value.toUpperCase(); 
+        const motivoSelect = document.getElementById('diag_motivo');
+        let motivoTexto = motivoSelect.options[motivoSelect.selectedIndex].text;
+        
+        // Assunto atualizado
+        let assuntoTexto = `DIAGNÓSTICO DE CANCELAMENTO - ${codRazao} - ${motivoTexto}`;
+        let assunto = encodeURIComponent(assuntoTexto);
+
+        // Saudação dinâmica
+        const now = new Date();
+        const hour = now.getHours();
+        const saudacao = hour < 12 ? "Bom dia" : "Boa tarde";
+
+        // Corpo atualizado
+        const corpoTexto = `${saudacao},\n\nSegue diagnóstico de cancelamento do cliente: ${codRazao}.`;
+        const corpo = encodeURIComponent(corpoTexto);
+        
+        window.location.href = `mailto:?subject=${assunto}&body=${corpo}`;
+    }
+
     const defaultSegments = ["AGRONEGOCIO", "ALIMENTACAO", "AUTOMOTIVOS E NAUTICO", "CALCADOS E ACESSORIOS", "ELETRONICOS", "ENTRETENIMENTO", "INSTITUICOES DE ENSINO", "JOALHERIA E BIJOUTERIAS", "MAGAZINES E LOJAS DEPARTAMENTOS", "MAQUINAS E PECAS", "MATERIAL CONSTRUCAO E ACABAMENTO", "MOVEIS E DECORACAO", "OTICA E RELOJOARIA", "PRODUTOS DIVERSOS", "SAUDE E ESTETICA", "SERVICOS DIVERSOS", "TURISMO", "VESTUARIO"];
     const defaultAlcadas = ["Selecione...", "Aprovado", "Alçada Regional", "Gerência Nacional de Negócios", "Diretor Nacional", "Vice - Presidência", "Presidência", "CAPI", "POC de Negócios", "Negado"];
     let currentSegments = [], currentAlcadas = [];
