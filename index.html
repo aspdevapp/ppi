@@ -173,12 +173,12 @@
                 <tbody id="tbodyAlcadaExtras">
                     <tr>
                         <td style="width: 40%;">Taxas (IP)</td>
-                        <td style="width: 30%;"><input type="text" id="inputTaxaIP" placeholder="0,00%" onkeyup="formatarPorcentagemInput(this); verificarTaxas()"></td>
+                        <td style="width: 30%;"><input type="text" id="inputTaxaIP" value="0,00%" onkeyup="formatarPorcentagemInput(this); verificarTaxas()"></td>
                         <td style="width: 30%;"><select class="sel-alcada" id="selAlcadaTaxaIP" onchange="verificarTaxas()"></select></td>
                     </tr>
                     <tr>
                         <td>Taxas (Flat/A.M)</td>
-                        <td><input type="text" id="inputTaxaFlat" placeholder="0,00%" onkeyup="formatarPorcentagemInput(this); verificarTaxas()"></td>
+                        <td><input type="text" id="inputTaxaFlat" value="0,00%" onkeyup="formatarPorcentagemInput(this); verificarTaxas()"></td>
                         <td><select class="sel-alcada" id="selAlcadaTaxaFlat" onchange="verificarTaxas()"></select></td>
                     </tr>
                     <tr><td>Prazo de Acatamento</td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
@@ -260,7 +260,13 @@
         if(!select) return;
         const valStr = input.value.trim();
         const valNum = limparValorMoeda(valStr);
-        if (valStr === "" || valStr === "0,00" || valNum === 0) { select.value = "Aprovado"; select.disabled = true; } else { select.disabled = false; }
+        // REFORÇO DA REGRA VAZIO/ZERO/0,00%
+        if (valStr === "" || valStr === "0,00" || valStr === "0,00%" || valNum === 0) { 
+            select.value = "Aprovado"; 
+            select.disabled = true; 
+        } else { 
+            select.disabled = false; 
+        }
     }
 
     function verificarFaturamento() {
@@ -360,7 +366,7 @@
         row.appendChild(td1); row.appendChild(td2); row.appendChild(td3); tbody.appendChild(row);
     }
 
-    // --- FUNÇÃO PREPARAR E-MAIL COM FLUXO CORRETO ---
+    // --- FUNÇÃO PREPARAR E-MAIL ---
     async function prepararEmail() {
         const razao = document.getElementById('inpRazao').value;
         const lead = document.getElementById('inpLead').value;
@@ -368,7 +374,6 @@
         const subTipoSelect = document.getElementById('subTipoVenda');
         const subTipo = subTipoSelect.options[subTipoSelect.selectedIndex].text;
         
-        // CÓDIGO DO PRODUTO (NOVO)
         const produtoFull = document.getElementById('inpProduto').value;
         let prodCode = "";
         if(produtoFull === "MultiCheck") prodCode = "CH";
@@ -376,13 +381,11 @@
         else if(produtoFull === "PayCheck") prodCode = "PAY";
         else prodCode = produtoFull;
 
-        // VALIDAÇÃO BÁSICA DE CAMPOS (Incluindo Upload Sparta)
         if(!razao || !lead || !estado || !document.getElementById('inputSegmento').value || !document.getElementById('inpLojas').value) {
-            alert("Preencha todos os campos obrigatórios (Razão, Lead, Estado, Lojas, Segmento, Produto) e faça o Upload.");
+            alert("Preencha todos os campos obrigatórios e faça o Upload.");
             return;
         }
         
-        // Verifica Sparta Upload
         const spartaInput = document.getElementById('uploadSparta');
         if (spartaInput.files.length === 0) {
             alert("ERRO: É obrigatório fazer o upload de pelo menos 1 arquivo no campo PESQUISA PROFUNDA (SPARTA).");
@@ -391,12 +394,10 @@
 
         await gerarImagemResumo(true); 
         
-        // SAUDAÇÃO DINÂMICA
         const now = new Date();
         const hour = now.getHours();
         const saudacao = hour < 12 ? "Bom dia" : "Boa tarde";
 
-        // CORPO DE E-MAIL DINÂMICO
         const subject = encodeURIComponent(`${subTipo} - ${prodCode} - ${razao} - ${lead} - ${estado}`);
         const rawBody = `${saudacao},
 
@@ -409,7 +410,7 @@ Em anexo as seguintes documentações:
 
 Abaixo Checklist da venda:
 
-`; // Quebras de linha para a imagem
+`; 
         const body = encodeURIComponent(rawBody);
 
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
@@ -431,7 +432,6 @@ Abaixo Checklist da venda:
             }
             if (typeof html2canvas === 'undefined') { alert("Erro: Biblioteca de geração de imagem não carregou. Verifique sua conexão."); return; }
 
-            // VALIDAÇÃO UPLOAD SPARTA (NOVA - 31.0)
             const spartaInput = document.getElementById('uploadSparta');
             if (spartaInput.files.length === 0) {
                 alert("ERRO: É obrigatório fazer o upload de pelo menos 1 arquivo no campo PESQUISA PROFUNDA (SPARTA).");
@@ -616,6 +616,8 @@ Abaixo Checklist da venda:
         verificarFaturamento();
         verificarDataCNPJ();
         verificarPendencias();
+        // INICIALIZA O VERIFICAR TAXAS
+        verificarTaxas(); 
         document.querySelectorAll('input[onkeyup*="verificarGenerico"]').forEach(input => verificarGenerico(input));
     };
 
