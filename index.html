@@ -15,6 +15,7 @@
             --dark-color: #343a40;
             --danger-color: #dc3545;
             --disabled-bg: #e9ecef;
+            --email-color: #6f42c1;
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; padding: 20px; color: var(--text-color); }
@@ -63,12 +64,17 @@
 
         #resultadoModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; padding: 20px; }
         .resultado-content { background: #fff; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 8px; text-align: center; }
-        .btn-copy { background-color: #17a2b8; color: white; padding: 10px 25px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px; }
-        .btn-close-res { background-color: #6c757d; color: white; padding: 10px 25px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px; }
+        
+        .action-buttons { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .btn-copy { background-color: #17a2b8; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 5px;}
+        .btn-download { background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 5px;}
+        .btn-email { background-color: var(--email-color); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 5px;}
+        .btn-email:hover { background-color: #5a32a3; }
+        .btn-close-res { background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
 
         /* RELATÓRIO OCULTO */
         #reportToImage { position: absolute; left: -9999px; top: 0; width: 800px; background: white; padding: 40px; font-family: Arial, sans-serif; border: 1px solid #ccc; box-sizing: border-box; }
-        #reportToImage h2 { border-bottom: 2px solid #0056b3; color: #0056b3; padding-bottom: 10px; }
+        #reportToImage h2 { border-bottom: 2px solid #0056b3; color: #0056b3; padding-bottom: 10px; text-transform: uppercase; }
         .rep-row { margin-bottom: 10px; display: flex; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .rep-label { font-weight: bold; width: 250px; color: #555; }
         .rep-value { flex: 1; color: #000; font-weight: 500; }
@@ -116,6 +122,21 @@
         <h3>Dados do Cliente</h3>
         <div class="form-group"><label>Razão Social:</label><input type="text" id="inpRazao" placeholder="Digite a Razão Social" oninput="this.value = this.value.toUpperCase()"></div>
         <div class="form-group"><label>Nome do Lead (Sparta):</label><input type="text" id="inpLead" placeholder="Nome igual do SPARTA" oninput="this.value = this.value.toUpperCase()"></div>
+        
+        <div class="form-group">
+            <label>Em que Estado o cliente fica localizado?</label>
+            <select id="inpEstado">
+                <option value="">Selecione...</option>
+                <option value="AC">AC</option><option value="AL">AL</option><option value="AP">AP</option><option value="AM">AM</option>
+                <option value="BA">BA</option><option value="CE">CE</option><option value="DF">DF</option><option value="ES">ES</option>
+                <option value="GO">GO</option><option value="MA">MA</option><option value="MT">MT</option><option value="MS">MS</option>
+                <option value="MG">MG</option><option value="PA">PA</option><option value="PB">PB</option><option value="PR">PR</option>
+                <option value="PE">PE</option><option value="PI">PI</option><option value="RJ">RJ</option><option value="RN">RN</option>
+                <option value="RS">RS</option><option value="RO">RO</option><option value="RR">RR</option><option value="SC">SC</option>
+                <option value="SP">SP</option><option value="SE">SE</option><option value="TO">TO</option>
+            </select>
+        </div>
+
         <div class="form-group"><label>Quantidade de Lojas:</label><input type="number" id="inpLojas" placeholder="0"></div>
         <div class="form-group"><label>Segmento:</label><select id="inputSegmento" onchange="verificarFaturamento()"><option value="">Carregando...</option></select></div>
         <div class="form-group"><label>Produto:</label><select id="inpProduto" onchange="verificarFaturamento()"><option value="MultiCheck">MultiCheck</option><option value="MultiCrediário">MultiCrediário</option><option value="PayCheck">PayCheck</option></select></div>
@@ -150,13 +171,30 @@
 
             <table class="alcada-table" style="margin-top:0; border-top:none;">
                 <tbody id="tbodyAlcadaExtras">
-                    <tr><td style="width: 40%;">Taxas (IP)</td><td style="width: 30%;"><input type="text" onkeyup="verificarGenerico(this)"></td><td style="width: 30%;"><select class="sel-alcada"></select></td></tr>
-                    <tr><td>Taxas (Flat/A.M)</td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
+                    <tr>
+                        <td style="width: 40%;">Taxas (IP)</td>
+                        <td style="width: 30%;"><input type="text" id="inputTaxaIP" placeholder="0,00%" onkeyup="formatarPorcentagemInput(this); verificarTaxas()"></td>
+                        <td style="width: 30%;"><select class="sel-alcada" id="selAlcadaTaxaIP" onchange="verificarTaxas()"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Taxas (Flat/A.M)</td>
+                        <td><input type="text" id="inputTaxaFlat" placeholder="0,00%" onkeyup="formatarPorcentagemInput(this); verificarTaxas()"></td>
+                        <td><select class="sel-alcada" id="selAlcadaTaxaFlat" onchange="verificarTaxas()"></select></td>
+                    </tr>
                     <tr><td>Prazo de Acatamento</td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
                     <tr><td>TAP/TGO</td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
                     <tr><td><input type="text" placeholder="Outro Item (Digite o nome)"></td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
                 </tbody>
             </table>
+            
+            <div id="formDefesaTaxas" class="sub-form-alert" style="display:none;">
+                <h4 id="tituloDefesaTaxas" style="color: #856404; margin-top: 0;">Justificativa de Taxas</h4>
+                <div>
+                    <label>Defesa das taxas para Alçada (Obrigatório > 50 caracteres):</label>
+                    <textarea id="textoDefesaTaxas" rows="3" placeholder="Justifique a solicitação destas taxas especiais..."></textarea>
+                </div>
+            </div>
+
             <div style="text-align: right; margin-top: 10px;"><button type="button" class="btn-add-row" onclick="adicionarLinhaAlcada()">+ Adicionar Item Personalizado</button></div>
         </div>
 
@@ -170,7 +208,21 @@
 </div>
 
 <div id="reportToImage"><h2 style="text-align:center;">SOLICITAÇÃO DE VENDAS - PPI</h2><div id="reportContent"></div><div id="reportImages" class="rep-images"></div></div>
-<div id="resultadoModal"><div class="resultado-content"><h3 style="color: var(--primary-color);">Solicitação Gerada com Sucesso!</h3><p>Abaixo está a imagem gerada. Clique em "Copiar Imagem" para colar no e-mail.</p><div id="imgOutputContainer" style="border: 1px solid #ccc; padding: 5px; margin-bottom: 10px; overflow-x: auto;"></div><button class="btn-copy" onclick="copiarImagem()">📋 Copiar Imagem</button><button class="btn-close-res" onclick="document.getElementById('resultadoModal').style.display='none'">Fechar</button></div></div>
+
+<div id="resultadoModal">
+    <div class="resultado-content">
+        <h3 style="color: var(--primary-color);">Solicitação Gerada com Sucesso!</h3>
+        <p>Abaixo está a imagem gerada. Se "Copiar" falhar, use "Baixar" e anexe ao e-mail.</p>
+        <div id="imgOutputContainer" style="border: 1px solid #ccc; padding: 5px; margin-bottom: 10px; overflow-x: auto;"></div>
+        <div class="action-buttons">
+            <button class="btn-email" onclick="prepararEmail()">📧 Criar E-mail</button>
+            <button class="btn-copy" onclick="copiarImagem()">📋 Copiar Imagem</button>
+            <button class="btn-download" onclick="baixarImagem()">💾 Baixar Imagem</button>
+            <button class="btn-close-res" onclick="document.getElementById('resultadoModal').style.display='none'">Fechar</button>
+        </div>
+    </div>
+</div>
+
 <div id="configModal" class="modal-overlay"><div class="modal-content"><div class="modal-header"><h3>Configurações</h3><span style="cursor:pointer; font-size:20px;" onclick="fecharConfig()">×</span></div><label>Segmentos:</label><textarea id="cfgSegmentos" class="config-area"></textarea><label>Alçadas:</label><textarea id="cfgAlcadas" class="config-area"></textarea><div class="modal-footer"><button class="btn-reset-factory" onclick="resetarFabrica()">Restaurar Padrões</button><div><button onclick="fecharConfig()" style="margin-right:5px; padding:5px;">Cancelar</button><button onclick="salvarConfig()" style="padding:5px;">Salvar</button></div></div></div></div>
 
 <script>
@@ -183,9 +235,17 @@
         value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
         element.value = value;
     }
+    function formatarPorcentagemInput(element) {
+        let value = element.value.replace(/\D/g, "");
+        if (value === "") { element.value = ""; return; }
+        value = (value / 100).toFixed(2) + "";
+        value = value.replace(".", ",");
+        element.value = value + "%";
+    }
     function limparValorMoeda(valorStr) {
         if (!valorStr) return 0;
-        let limpo = valorStr.replace(/\./g, "").replace(",", ".");
+        let limpo = valorStr.replace("R$", "").replace("%","").trim();
+        limpo = limpo.replace(/\./g, "").replace(",", ".");
         return parseFloat(limpo) || 0;
     }
     function formatarDataBR(dataStr) {
@@ -210,26 +270,15 @@
         const selAlcada = document.getElementById('selAlcadaFaturamento');
         const faturamentoVal = limparValorMoeda(faturamentoStr);
 
-        if (!faturamentoStr || faturamentoStr.trim() === "" || faturamentoVal === 0) {
-            selAlcada.value = "Aprovado";
-            selAlcada.disabled = true;
-            selAlcada.title = "Campo de valor vazio ou zerado: Aprovado automaticamente.";
-            return;
-        }
+        if (!faturamentoStr || faturamentoStr.trim() === "" || faturamentoVal === 0) { selAlcada.value = "Aprovado"; selAlcada.disabled = true; return; }
         if (!produto || !segmento) { selAlcada.disabled = false; return; }
 
         let limite = 0;
-        if (faturamentoRules[produto] && faturamentoRules[produto][segmento]) {
-            limite = faturamentoRules[produto][segmento];
-        }
+        if (faturamentoRules[produto] && faturamentoRules[produto][segmento]) { limite = faturamentoRules[produto][segmento]; }
 
         if (limite > 0) {
             selAlcada.disabled = true;
-            if (faturamentoVal < limite) {
-                selAlcada.value = "CAPI";
-            } else {
-                selAlcada.value = "Aprovado";
-            }
+            if (faturamentoVal < limite) { selAlcada.value = "CAPI"; } else { selAlcada.value = "Aprovado"; }
         } else {
             selAlcada.disabled = false;
         }
@@ -242,26 +291,15 @@
         const tbody = document.querySelector('#tabelaRestricoes tbody');
         const selAlcada = document.getElementById('selAlcadaPendencias');
 
-        if (inputVal > 7500.01) { 
-            detalheDiv.style.display = 'block'; 
-            if(tbody.rows.length===0) adicionarLinhaRestricao(); 
-        } else { 
-            detalheDiv.style.display = 'none'; 
-        }
+        if (inputVal > 7500.01) { detalheDiv.style.display = 'block'; if(tbody.rows.length===0) adicionarLinhaRestricao(); } else { detalheDiv.style.display = 'none'; }
 
-        if (!inputValStr || inputVal === 0) {
-            selAlcada.value = "Aprovado";
-            selAlcada.disabled = true;
-            return;
-        }
+        if (!inputValStr || inputVal === 0) { selAlcada.value = "Aprovado"; selAlcada.disabled = true; return; }
 
         selAlcada.disabled = true; 
-        let novaAlcada = "Selecione...";
-        if (inputVal <= 7500.00) { novaAlcada = "Aprovado"; }
-        else if (inputVal <= 35000.00) { novaAlcada = "Gerência Nacional de Negócios"; }
-        else if (inputVal <= 70000.00) { novaAlcada = "Vice - Presidência"; }
-        else { novaAlcada = "Presidência"; }
-        selAlcada.value = novaAlcada;
+        if (inputVal <= 7500.00) { selAlcada.value = "Aprovado"; }
+        else if (inputVal <= 35000.00) { selAlcada.value = "Gerência Nacional de Negócios"; }
+        else if (inputVal <= 70000.00) { selAlcada.value = "Vice - Presidência"; }
+        else { selAlcada.value = "Presidência"; }
     }
 
     function adicionarLinhaRestricao() {
@@ -274,22 +312,37 @@
     function verificarDataCNPJ() {
         const inputDateVal = document.getElementById('inputDataAbertura').value;
         const selectAlcada = document.getElementById('selAlcadaData');
-        
-        if (!inputDateVal) { 
-            selectAlcada.value = "Aprovado"; 
-            selectAlcada.disabled = true; 
-            return; 
-        }
-
+        if (!inputDateVal) { selectAlcada.value = "Aprovado"; selectAlcada.disabled = true; return; }
         const dataAbertura = new Date(inputDateVal);
         const dataLimite = new Date(); dataLimite.setFullYear(dataLimite.getFullYear() - 1); dataAbertura.setHours(0,0,0,0); dataLimite.setHours(0,0,0,0);
+        if (dataAbertura <= dataLimite) { selectAlcada.value = "Aprovado"; selectAlcada.disabled = true; } else { selectAlcada.value = "CAPI"; selectAlcada.disabled = true; }
+    }
+
+    function verificarTaxas() {
+        const taxaIP = limparValorMoeda(document.getElementById('inputTaxaIP').value);
+        const taxaFlat = limparValorMoeda(document.getElementById('inputTaxaFlat').value);
+        const divDefesa = document.getElementById('formDefesaTaxas');
+        const tituloDefesa = document.getElementById('tituloDefesaTaxas');
         
-        if (dataAbertura <= dataLimite) { 
-            selectAlcada.value = "Aprovado"; 
-            selectAlcada.disabled = true; 
-        } else { 
-            selectAlcada.value = "CAPI"; 
-            selectAlcada.disabled = true; 
+        verificarGenerico(document.getElementById('inputTaxaIP'));
+        verificarGenerico(document.getElementById('inputTaxaFlat'));
+
+        if (taxaIP > 0 || taxaFlat > 0) {
+            divDefesa.style.display = 'block';
+            const alcadaIP = document.getElementById('selAlcadaTaxaIP').value;
+            const alcadaFlat = document.getElementById('selAlcadaTaxaFlat').value;
+            let alçadasRelevantes = [];
+            if(alcadaIP !== "Selecione..." && alcadaIP !== "Aprovado") alçadasRelevantes.push(alcadaIP);
+            if(alcadaFlat !== "Selecione..." && alcadaFlat !== "Aprovado") alçadasRelevantes.push(alcadaFlat);
+            alçadasRelevantes = [...new Set(alçadasRelevantes)];
+
+            if(alçadasRelevantes.length > 0) {
+                tituloDefesa.innerText = "Defesa das taxas para Alçada: " + alçadasRelevantes.join(" / ");
+            } else {
+                tituloDefesa.innerText = "Justificativa de Taxas (Alçada Definir)";
+            }
+        } else {
+            divDefesa.style.display = 'none';
         }
     }
 
@@ -307,16 +360,54 @@
         row.appendChild(td1); row.appendChild(td2); row.appendChild(td3); tbody.appendChild(row);
     }
 
-    async function gerarImagemResumo() {
+    // --- NOVA LÓGICA DE E-MAIL COM CÓDIGOS DE PRODUTO ---
+    async function prepararEmail() {
+        // Validação básica antes de tentar gerar
+        const razao = document.getElementById('inpRazao').value;
+        const lead = document.getElementById('inpLead').value;
+        const estado = document.getElementById('inpEstado').value;
+        const subTipoSelect = document.getElementById('subTipoVenda');
+        const subTipo = subTipoSelect.options[subTipoSelect.selectedIndex].text;
+        
+        // Mapeamento de Produto
+        const produtoFull = document.getElementById('inpProduto').value;
+        let prodCode = "";
+        if(produtoFull === "MultiCheck") prodCode = "CH";
+        else if(produtoFull === "MultiCrediário") prodCode = "CR";
+        else if(produtoFull === "PayCheck") prodCode = "PAY";
+        else prodCode = produtoFull; // Fallback
+
+        if(!razao || !lead || !estado) {
+            alert("Preencha Razão Social, Lead e Estado para gerar o e-mail.");
+            return;
+        }
+
+        // Gera e copia a imagem
+        await gerarImagemResumo(true); 
+        
+        // Monta o Assunto
+        const subject = encodeURIComponent(`${subTipo} - ${prodCode} - ${razao} - ${lead} - ${estado}`);
+        const body = encodeURIComponent(`Prezados,\n\nSegue abaixo a solicitação de vendas gerada pelo PPI.\n\n\n[COLE A IMAGEM AQUI (Pressione Ctrl + V)]\n\n\nAtenciosamente,\nComercial`);
+
+        // Abre o cliente de e-mail
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    }
+
+    async function gerarImagemResumo(isEmailMode = false) {
         try {
             const razao = document.getElementById('inpRazao').value.trim();
             const lead = document.getElementById('inpLead').value.trim();
+            const estado = document.getElementById('inpEstado').value;
             const lojas = document.getElementById('inpLojas').value.trim();
             const segmento = document.getElementById('inputSegmento').value;
             const produto = document.getElementById('inpProduto').value;
 
-            if (!razao || !lead || !lojas || !segmento || !produto) { alert("ERRO: Preencha campos obrigatórios (Razão, Lead, Lojas, Segmento, Produto)."); return; }
-            if (typeof html2canvas === 'undefined') { alert("Erro: Biblioteca de imagem não carregou."); return; }
+            // VALIDAÇÃO INCLUINDO ESTADO
+            if (!razao || !lead || !estado || !lojas || !segmento || !produto) { 
+                alert("ERRO: Preencha todos os campos obrigatórios:\n- Razão Social\n- Lead (Sparta)\n- Estado (UF)\n- Qtd. Lojas\n- Segmento\n- Produto"); 
+                return; 
+            }
+            if (typeof html2canvas === 'undefined') { alert("Erro: Biblioteca de geração de imagem não carregou. Verifique sua conexão."); return; }
 
             const pendenciasStr = document.getElementById('inputPendencias').value;
             const totalPendencias = limparValorMoeda(pendenciasStr);
@@ -338,8 +429,13 @@
                 if (Math.abs(totalPendencias - somaRestricoes) > 0.01) { alert("Soma das restrições não bate com o total."); return; }
 
                 const txtDefesa = document.getElementById('textoDefesaRestricao').value.trim();
-                if (!document.getElementById('dataPrimeiraRestricao').value || !document.getElementById('dataUltimaRestricao').value) { alert("Preencha datas das restrições."); return; }
-                if (txtDefesa.length < 100) { alert("Defesa deve ter no mínimo 100 caracteres."); return; }
+                if (!document.getElementById('dataPrimeiraRestricao').value || !document.getElementById('dataUltimaRestricao').value) { alert("Preencha as datas das restrições."); return; }
+                if (txtDefesa.length < 100) { alert("Defesa de restrições deve ter no mínimo 100 caracteres."); return; }
+            }
+
+            if(document.getElementById('formDefesaTaxas').style.display === 'block') {
+                const txtTaxas = document.getElementById('textoDefesaTaxas').value.trim();
+                if(txtTaxas.length < 50) { alert("ERRO: Defesa das Taxas deve ter no mínimo 50 caracteres."); return; }
             }
 
             const reportDiv = document.getElementById('reportToImage');
@@ -347,11 +443,21 @@
             const imgDiv = document.getElementById('reportImages');
             contentDiv.innerHTML = ''; imgDiv.innerHTML = '';
 
+            const tipo = document.getElementById('tipoSolicitacao').value;
+            let subTipo = "GERAL";
+            if (tipo === 'VENDAS') {
+                 const sb = document.getElementById('subTipoVenda');
+                 subTipo = sb.options[sb.selectedIndex].text;
+            }
+            document.querySelector('#reportToImage h2').innerText = `SOLICITAÇÃO DE ${tipo} - ${subTipo}`;
+
             const foraAlcada = document.getElementById('selectForaAlcada').value;
 
+            // ADICIONADO ESTADO NO HTML DA IMAGEM
             let html = `<div class="rep-row"><span class="rep-label">Tipo:</span> <span class="rep-value">VENDAS (${document.getElementById('subTipoVenda').value})</span></div>
                         <div class="rep-row"><span class="rep-label">Razão:</span> <span class="rep-value">${razao}</span></div>
                         <div class="rep-row"><span class="rep-label">Lead:</span> <span class="rep-value">${lead}</span></div>
+                        <div class="rep-row"><span class="rep-label">Estado:</span> <span class="rep-value">${estado}</span></div>
                         <div class="rep-row"><span class="rep-label">Lojas:</span> <span class="rep-value">${lojas}</span></div>
                         <div class="rep-row"><span class="rep-label">Seg:</span> <span class="rep-value">${segmento}</span></div>
                         <div class="rep-row"><span class="rep-label">Prod:</span> <span class="rep-value">${produto}</span></div>
@@ -359,7 +465,6 @@
 
             if(foraAlcada === 'SIM') {
                 html += `<h3>Condições Especiais</h3><table class="rep-table"><thead><tr><th>Item</th><th>Valor</th><th>Alçada</th></tr></thead><tbody>`;
-                
                 document.querySelectorAll('#tabelaCondicoesBase tbody tr').forEach(tr => {
                     const tds = tr.querySelectorAll('td');
                     const item = tds[0].innerText.trim();
@@ -380,7 +485,6 @@
                 html += `</tbody></table>`;
 
                 if(totalPendencias > 7500.01) {
-                    // DESTAQUE VERMELHO AQUI
                     html += `<div style="border: 2px solid #dc3545; padding: 10px; margin-top: 15px; border-radius: 5px; background-color: #fff8f8;">
                                 <h4 style="color: #dc3545; margin-top: 0; border-bottom: none;">⚠️ Detalhamento de Restrições (> R$ 7.500,01)</h4>
                                 <table class="rep-table" style="width: 100%; border: 1px solid #dc3545;">
@@ -400,8 +504,22 @@
                                 <div style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; margin-top:5px; color:#333;">${def}</div>
                              </div></div>`;
                 }
+
+                if(document.getElementById('formDefesaTaxas').style.display === 'block') {
+                    const tituloTaxas = document.getElementById('tituloDefesaTaxas').innerText;
+                    const textoTaxas = document.getElementById('textoDefesaTaxas').value;
+                    html += `<div style="border: 2px solid #dc3545; padding: 10px; margin-top: 15px; border-radius: 5px; background-color: #fff8f8;">
+                                <h4 style="color: #dc3545; margin-top: 0; border-bottom: none;">⚠️ ${tituloTaxas}</h4>
+                                <div style="margin-top:10px; padding:10px; background:white; border:1px solid #f5c6cb;">
+                                    <div style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; margin-top:5px; color:#333;">${textoTaxas}</div>
+                                </div>
+                             </div>`;
+                }
             }
-            html += `<div style="margin-top:20px; border:1px solid #ddd; padding:10px;"><strong>PARECER:</strong><br><div style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;">${parecer}</div></div>`;
+            html += `<div style="margin-top:20px; border:1px solid #ddd; padding:10px;">
+                        <strong>PARECER:</strong><br>
+                        <div style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; margin-top:5px;">${parecer}</div>
+                     </div>`;
             contentDiv.innerHTML = html;
 
             const fileInput = document.getElementById('uploadSparta');
@@ -418,13 +536,45 @@
                 html2canvas(reportDiv, { scale: 1 }).then(canvas => {
                     const out = document.getElementById('imgOutputContainer'); out.innerHTML = '';
                     canvas.id = "finalCanvas"; canvas.style.maxWidth = "100%"; out.appendChild(canvas);
-                    document.getElementById('resultadoModal').style.display = 'block';
+                    
+                    if(isEmailMode) {
+                        copiarImagem();
+                    } else {
+                        document.getElementById('resultadoModal').style.display = 'block';
+                    }
                 }).catch(e => alert("Erro ao renderizar imagem: " + e));
             }, 800);
         } catch(err) {
             alert("Erro fatal no script: " + err.message);
             console.error(err);
         }
+    }
+
+    function copiarImagem() {
+        const canvas = document.getElementById('finalCanvas');
+        if(!canvas) return;
+        canvas.toBlob(blob => {
+            try {
+                const item = new ClipboardItem({ 'image/png': blob });
+                navigator.clipboard.write([item]).then(() => {
+                    alert('Imagem copiada! Cole no e-mail (Ctrl+V).');
+                }).catch(err => {
+                    console.error("Falha ao copiar:", err);
+                    alert("Seu navegador bloqueou a cópia direta. Por favor, clique com o botão direito na imagem e selecione 'Copiar imagem' ou use o botão 'Baixar Imagem'.");
+                });
+            } catch (e) {
+                alert("Seu navegador não suporta cópia automática. Use o botão direito do mouse ou o botão 'Baixar Imagem'.");
+            }
+        });
+    }
+
+    function baixarImagem() {
+        const canvas = document.getElementById('finalCanvas');
+        if(!canvas) return;
+        const link = document.createElement('a');
+        link.download = 'PPI_Solicitacao.png';
+        link.href = canvas.toDataURL();
+        link.click();
     }
 
     const defaultSegments = ["AGRONEGOCIO", "ALIMENTACAO", "AUTOMOTIVOS E NAUTICO", "CALCADOS E ACESSORIOS", "ELETRONICOS", "ENTRETENIMENTO", "INSTITUICOES DE ENSINO", "JOALHERIA E BIJOUTERIAS", "MAGAZINES E LOJAS DEPARTAMENTOS", "MAQUINAS E PECAS", "MATERIAL CONSTRUCAO E ACABAMENTO", "MOVEIS E DECORACAO", "OTICA E RELOJOARIA", "PRODUTOS DIVERSOS", "SAUDE E ESTETICA", "SERVICOS DIVERSOS", "TURISMO", "VESTUARIO"];
