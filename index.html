@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPI - Portal de Processos Interno</title>
+    <title>PPI - Portal de Processos Internos</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root {
@@ -102,7 +102,7 @@
     </div>
 
     <header>
-        <h1>PPI - Portal de Processos Interno</h1>
+        <h1>PPI - Portal de Processos Internos</h1>
         <p>Centralização de Vendas, Pós-Vendas e Administrativo</p>
     </header>
 
@@ -118,7 +118,13 @@
 
     <div id="section-VENDAS" class="section-content">
         <h2>Solicitação de Vendas</h2>
-        <div class="form-group"><label>Sub-tipo de Venda:</label><select id="subTipoVenda"><option value="CAPI">CAPI DE VENDAS</option><option value="POC">POC DE VENDAS</option></select></div>
+        <div class="form-group">
+            <label>Sub-tipo de Venda:</label>
+            <select id="subTipoVenda" onchange="populateAlcadas()">
+                <option value="CAPI">CAPI DE VENDAS</option>
+                <option value="POC">POC DE NEGÓCIOS</option>
+            </select>
+        </div>
         <h3>Dados do Cliente</h3>
         <div class="form-group"><label>Razão Social:</label><input type="text" id="inpRazao" placeholder="Digite a Razão Social" oninput="this.value = this.value.toUpperCase()"></div>
         <div class="form-group"><label>Nome do Lead (Sparta):</label><input type="text" id="inpLead" placeholder="Nome igual do SPARTA" oninput="this.value = this.value.toUpperCase()"></div>
@@ -139,7 +145,7 @@
 
         <div class="form-group"><label>Quantidade de Lojas:</label><input type="number" id="inpLojas" placeholder="0"></div>
         <div class="form-group"><label>Segmento:</label><select id="inputSegmento" onchange="verificarFaturamento()"><option value="">Carregando...</option></select></div>
-        <div class="form-group"><label>Produto:</label><select id="inpProduto" onchange="verificarFaturamento()"><option value="MultiCheck">MultiCheck</option><option value="MultiCrediário">MultiCrediário</option><option value="PayCheck">PayCheck</option></select></div>
+        <div class="form-group"><label>Produto:</label><select id="inpProduto" onchange="verificarFaturamento(); verificarPrazoAcatamento(); verificarCarencia()"><option value="MultiCheck">MultiCheck</option><option value="MultiCrediário">MultiCrediário</option><option value="PayCheck">PayCheck</option></select></div>
         <hr>
         <div class="form-group"><label>Há condição fora da alçada do regional?</label><select id="selectForaAlcada" onchange="toggleAlcada()"><option value="NAO">NÃO</option><option value="SIM">SIM</option></select></div>
 
@@ -148,7 +154,7 @@
             <table class="alcada-table" id="tabelaCondicoesBase">
                 <thead><tr><th style="width: 40%;">ITEM</th><th style="width: 30%;">VALOR / DADO</th><th style="width: 30%;">ALÇADA</th></tr></thead>
                 <tbody>
-                    <tr><td>Faturamento Presumido</td><td><input type="text" id="inputFaturamento" placeholder="0,00" onkeyup="formatarMoedaInput(this); verificarFaturamento()"></td><td><select class="sel-alcada" id="selAlcadaFaturamento"></select></td></tr>
+                    <tr><td>Faturamento Presumido</td><td><input type="text" id="inputFaturamento" placeholder="0" onkeyup="formatarInteiroInput(this); verificarFaturamento()"></td><td><select class="sel-alcada" id="selAlcadaFaturamento"></select></td></tr>
                     <tr><td>Data de Abertura CNPJ</td><td><input type="date" id="inputDataAbertura" onchange="verificarDataCNPJ()"></td><td><select class="sel-alcada" id="selAlcadaData"></select></td></tr>
                     <tr><td>Pendências Financeiras (R$)</td><td><input type="text" id="inputPendencias" placeholder="0,00" onkeyup="formatarMoedaInput(this); verificarPendencias()"></td><td><select class="sel-alcada" id="selAlcadaPendencias"></select></td></tr>
                 </tbody>
@@ -173,17 +179,35 @@
                 <tbody id="tbodyAlcadaExtras">
                     <tr>
                         <td style="width: 40%;">Taxas (IP)</td>
-                        <td style="width: 30%;"><input type="text" id="inputTaxaIP" value="0,00%" onkeyup="formatarPorcentagemInput(this); verificarTaxas()"></td>
+                        <td style="width: 30%;"><input type="text" id="inputTaxaIP" value="0,00%" oninput="formatarPorcentagemInput(this, event); verificarTaxas()"></td>
                         <td style="width: 30%;"><select class="sel-alcada" id="selAlcadaTaxaIP" onchange="verificarTaxas()"></select></td>
                     </tr>
                     <tr>
                         <td>Taxas (Flat/A.M)</td>
-                        <td><input type="text" id="inputTaxaFlat" value="0,00%" onkeyup="formatarPorcentagemInput(this); verificarTaxas()"></td>
+                        <td><input type="text" id="inputTaxaFlat" value="0,00%" oninput="formatarPorcentagemInput(this, event); verificarTaxas()"></td>
                         <td><select class="sel-alcada" id="selAlcadaTaxaFlat" onchange="verificarTaxas()"></select></td>
                     </tr>
-                    <tr><td>Prazo de Acatamento</td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
+                    <tr>
+                        <td>Prazo de Acatamento</td>
+                        <td><input type="text" id="inputPrazo" onkeyup="verificarGenerico(this); verificarPrazoAcatamento()"></td>
+                        <td><select class="sel-alcada" id="selAlcadaPrazo"></select></td>
+                    </tr>
                     <tr><td>TAP/TGO</td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
-                    <tr><td><input type="text" placeholder="Outro Item (Digite o nome)"></td><td><input type="text" onkeyup="verificarGenerico(this)"></td><td><select class="sel-alcada"></select></td></tr>
+                    <tr>
+                        <td>Carência (OMC/Fat. Mín)</td>
+                        <td><input type="text" id="inputCarencia" onkeyup="verificarGenerico(this); verificarCarencia()"></td>
+                        <td><select class="sel-alcada" id="selAlcadaCarencia"></select></td>
+                    </tr>
+                    <tr>
+                        <td>Cliente é MEI?</td>
+                        <td>
+                            <select id="selectMei" onchange="verificarMei()">
+                                <option value="NAO" selected>NÃO</option>
+                                <option value="SIM">SIM</option>
+                            </select>
+                        </td>
+                        <td><select class="sel-alcada" id="selAlcadaMei"></select></td>
+                    </tr>
                 </tbody>
             </table>
             
@@ -235,13 +259,30 @@
         value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
         element.value = value;
     }
-    function formatarPorcentagemInput(element) {
+    
+    function formatarInteiroInput(element) {
         let value = element.value.replace(/\D/g, "");
-        if (value === "") { element.value = ""; return; }
-        value = (value / 100).toFixed(2) + "";
-        value = value.replace(".", ",");
-        element.value = value + "%";
+        value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+        element.value = value;
     }
+
+    function limparValorInteiro(valorStr) {
+        if (!valorStr) return 0;
+        let limpo = valorStr.replace(/\./g, "");
+        return parseInt(limpo, 10) || 0;
+    }
+
+    function formatarPorcentagemInput(element, event) {
+        let value = element.value.replace(/\D/g, "");
+        if (event && (event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward')) {
+            if (element.value.indexOf('%') === -1) { value = value.slice(0, -1); }
+        }
+        if (value === "") { element.value = ""; return; }
+        let intVal = parseInt(value, 10);
+        let formatted = (intVal / 100).toFixed(2).replace(".", ",");
+        element.value = formatted + "%";
+    }
+
     function limparValorMoeda(valorStr) {
         if (!valorStr) return 0;
         let limpo = valorStr.replace("R$", "").replace("%","").trim();
@@ -260,7 +301,6 @@
         if(!select) return;
         const valStr = input.value.trim();
         const valNum = limparValorMoeda(valStr);
-        // REFORÇO DA REGRA VAZIO/ZERO/0,00%
         if (valStr === "" || valStr === "0,00" || valStr === "0,00%" || valNum === 0) { 
             select.value = "Aprovado"; 
             select.disabled = true; 
@@ -269,12 +309,74 @@
         }
     }
 
+    function verificarPrazoAcatamento() {
+        const produto = document.getElementById('inpProduto').value;
+        const inputPrazo = document.getElementById('inputPrazo');
+        const selAlcada = document.getElementById('selAlcadaPrazo');
+        const valor = parseInt(inputPrazo.value.replace(/\D/g, "")) || 0;
+
+        if (valor === 0) {
+            selAlcada.value = "Aprovado";
+            selAlcada.disabled = true;
+            return;
+        }
+
+        let limite = 9999;
+        if (produto === "MultiCrediário") {
+            limite = 10;
+        } else if (produto === "PayCheck" || produto === "MultiCheck") {
+            limite = 30;
+        }
+
+        if (valor > limite) {
+            selAlcada.value = "CAPI";
+            selAlcada.disabled = true;
+        } else {
+            selAlcada.disabled = false;
+            if(selAlcada.value === "CAPI") selAlcada.value = "Selecione...";
+        }
+    }
+
+    // VERIFICAR CARÊNCIA
+    function verificarCarencia() {
+        const produto = document.getElementById('inpProduto').value;
+        const inputCarencia = document.getElementById('inputCarencia');
+        const selAlcada = document.getElementById('selAlcadaCarencia');
+        const valor = parseInt(inputCarencia.value.replace(/\D/g, "")) || 0;
+
+        if (!produto) { selAlcada.disabled = false; return; }
+        selAlcada.disabled = true;
+
+        if (valor === 0) {
+            selAlcada.value = "Aprovado";
+            return;
+        }
+
+        let isCapi = false;
+        if (produto === "MultiCrediário" && valor > 2) { isCapi = true; } 
+        else if ((produto === "PayCheck" || produto === "MultiCheck") && valor > 1) { isCapi = true; }
+
+        selAlcada.value = isCapi ? "CAPI" : "Aprovado";
+    }
+
+    // NOVA FUNÇÃO: VERIFICAR MEI
+    function verificarMei() {
+        const val = document.getElementById('selectMei').value;
+        const alcada = document.getElementById('selAlcadaMei');
+        alcada.disabled = true; // Sempre bloqueado
+        if (val === 'SIM') {
+            alcada.value = 'CAPI';
+        } else {
+            alcada.value = 'Aprovado';
+        }
+    }
+
     function verificarFaturamento() {
         const produto = document.getElementById('inpProduto').value;
         const segmento = document.getElementById('inputSegmento').value;
         const faturamentoStr = document.getElementById('inputFaturamento').value;
         const selAlcada = document.getElementById('selAlcadaFaturamento');
-        const faturamentoVal = limparValorMoeda(faturamentoStr);
+        const faturamentoVal = limparValorInteiro(faturamentoStr);
 
         if (!faturamentoStr || faturamentoStr.trim() === "" || faturamentoVal === 0) { selAlcada.value = "Aprovado"; selAlcada.disabled = true; return; }
         if (!produto || !segmento) { selAlcada.disabled = false; return; }
@@ -352,6 +454,25 @@
         }
     }
 
+    function populateAlcadas() {
+        const subTipoSelect = document.getElementById('subTipoVenda');
+        const subTipo = subTipoSelect ? subTipoSelect.value : "CAPI";
+
+        document.querySelectorAll('.sel-alcada').forEach(select => {
+            const valorAtual = select.value;
+            select.innerHTML = ''; 
+            currentAlcadas.forEach(alc => { 
+                if (alc === "POC de Negócios" && subTipo !== "POC") { return; }
+                let opt = document.createElement('option'); 
+                opt.value = alc; 
+                opt.text = alc; 
+                select.appendChild(opt); 
+            });
+            let optionExists = Array.from(select.options).some(o => o.value === valorAtual);
+            if(optionExists) { select.value = valorAtual; }
+        });
+    }
+
     function adicionarLinhaAlcada() {
         const tbody = document.getElementById('tbodyAlcadaExtras');
         const row = document.createElement('tr');
@@ -359,8 +480,15 @@
         const td2 = document.createElement('td'); td2.innerHTML = '<input type="text" placeholder="Valor" onkeyup="verificarGenerico(this)">';
         const td3 = document.createElement('td'); td3.className = 'flex-cell';
         const select = document.createElement('select'); select.className = 'sel-alcada';
+        // POPULA COM A LÓGICA FILTRADA
+        const subTipoSelect = document.getElementById('subTipoVenda');
+        const subTipo = subTipoSelect ? subTipoSelect.value : "CAPI";
+        currentAlcadas.forEach(alc => { 
+            if (alc === "POC de Negócios" && subTipo !== "POC") { return; }
+            let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); 
+        });
+        
         select.value = "Aprovado"; select.disabled = true;
-        currentAlcadas.forEach(alc => { let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); });
         const btnDel = document.createElement('button'); btnDel.type = 'button'; btnDel.textContent = 'X'; btnDel.className = 'btn-remove-row'; btnDel.onclick = function() { tbody.removeChild(row); };
         td3.appendChild(select); td3.appendChild(btnDel);
         row.appendChild(td1); row.appendChild(td2); row.appendChild(td3); tbody.appendChild(row);
@@ -488,9 +616,13 @@ Abaixo Checklist da venda:
                         <div class="rep-row"><span class="rep-label">Lead:</span> <span class="rep-value">${lead}</span></div>
                         <div class="rep-row"><span class="rep-label">Estado:</span> <span class="rep-value">${estado}</span></div>
                         <div class="rep-row"><span class="rep-label">Lojas:</span> <span class="rep-value">${lojas}</span></div>
-                        <div class="rep-row"><span class="rep-label">Seg:</span> <span class="rep-value">${segmento}</span></div>
-                        <div class="rep-row"><span class="rep-label">Prod:</span> <span class="rep-value">${produto}</span></div>
-                        <div class="rep-row"><span class="rep-label">Fora Alçada?</span> <span class="rep-value">${foraAlcada}</span></div>`;
+                        <div class="rep-row"><span class="rep-label">Segmento:</span> <span class="rep-value">${segmento}</span></div>
+                        <div class="rep-row"><span class="rep-label">Produto:</span> <span class="rep-value">${produto}</span></div>`;
+
+            // REGRA DE EXIBIÇÃO CONDICIONAL: SÓ MOSTRA SE FOR "NÃO"
+            if (foraAlcada === 'NAO') {
+                html += `<div class="rep-row"><span class="rep-label">Fora Alçada?</span> <span class="rep-value">${foraAlcada}</span></div>`;
+            }
 
             if(foraAlcada === 'SIM') {
                 html += `<h3>Condições Especiais</h3><table class="rep-table"><thead><tr><th>Item</th><th>Valor</th><th>Alçada</th></tr></thead><tbody>`;
@@ -505,11 +637,15 @@ Abaixo Checklist da venda:
                 
                 document.querySelectorAll('#tbodyAlcadaExtras tr').forEach(tr => {
                     const tds = tr.querySelectorAll('td');
-                    let itemInput = tds[0].querySelector('input');
-                    let item = itemInput ? itemInput.value : tds[0].innerText.trim();
-                    let val = tds[1].querySelector('input').value;
+                    
+                    // LÓGICA ATUALIZADA PARA LER SELECT OU INPUT
+                    let valElement = tds[1].querySelector('input') || tds[1].querySelector('select');
+                    let val = valElement ? valElement.value : '';
+                    
                     let alc = tds[2].querySelector('select').value;
-                    if(item && alc !== "Aprovado") html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
+                    
+                    // Filtra apenas se não for Aprovado
+                    if(alc !== "Aprovado") html += `<tr><td>${tds[0].innerText.trim()}</td><td>${val}</td><td>${alc}</td></tr>`;
                 });
                 html += `</tbody></table>`;
 
@@ -553,7 +689,7 @@ Abaixo Checklist da venda:
 
             const fileInput = document.getElementById('uploadSparta');
             if (fileInput.files.length > 0) {
-                imgDiv.innerHTML = '<h3>Anexos</h3>';
+                imgDiv.innerHTML = '<h3>PESQUISA PROFUNDA (SPARTA):</h3>';
                 for (let i = 0; i < fileInput.files.length; i++) {
                     const reader = new FileReader();
                     reader.onload = (e) => { const img = document.createElement('img'); img.src = e.target.result; imgDiv.appendChild(img); };
@@ -618,6 +754,7 @@ Abaixo Checklist da venda:
         verificarPendencias();
         // INICIALIZA O VERIFICAR TAXAS
         verificarTaxas(); 
+        verificarMei(); // INICIALIZA O MEI
         document.querySelectorAll('input[onkeyup*="verificarGenerico"]').forEach(input => verificarGenerico(input));
     };
 
@@ -638,11 +775,21 @@ Abaixo Checklist da venda:
         populateAlcadas();
     }
     function populateAlcadas() {
+        const subTipoSelect = document.getElementById('subTipoVenda');
+        const subTipo = subTipoSelect ? subTipoSelect.value : "CAPI";
+
         document.querySelectorAll('.sel-alcada').forEach(select => {
             const valorAtual = select.value;
             select.innerHTML = ''; 
-            currentAlcadas.forEach(alc => { let opt = document.createElement('option'); opt.value = alc; opt.text = alc; select.appendChild(opt); });
-            if(currentAlcadas.includes(valorAtual)) { select.value = valorAtual; }
+            currentAlcadas.forEach(alc => { 
+                if (alc === "POC de Negócios" && subTipo !== "POC") { return; }
+                let opt = document.createElement('option'); 
+                opt.value = alc; 
+                opt.text = alc; 
+                select.appendChild(opt); 
+            });
+            let optionExists = Array.from(select.options).some(o => o.value === valorAtual);
+            if(optionExists) { select.value = valorAtual; }
         });
     }
     function abrirConfig() { document.getElementById('cfgSegmentos').value = currentSegments.join('\n'); document.getElementById('cfgAlcadas').value = currentAlcadas.join('\n'); document.getElementById('configModal').style.display = 'flex'; }
