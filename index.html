@@ -360,36 +360,58 @@
         row.appendChild(td1); row.appendChild(td2); row.appendChild(td3); tbody.appendChild(row);
     }
 
-    // --- NOVA LÓGICA DE E-MAIL COM CÓDIGOS DE PRODUTO ---
+    // --- FUNÇÃO PREPARAR E-MAIL COM FLUXO CORRETO ---
     async function prepararEmail() {
-        // Validação básica antes de tentar gerar
         const razao = document.getElementById('inpRazao').value;
         const lead = document.getElementById('inpLead').value;
         const estado = document.getElementById('inpEstado').value;
         const subTipoSelect = document.getElementById('subTipoVenda');
         const subTipo = subTipoSelect.options[subTipoSelect.selectedIndex].text;
         
-        // Mapeamento de Produto
+        // CÓDIGO DO PRODUTO (NOVO)
         const produtoFull = document.getElementById('inpProduto').value;
         let prodCode = "";
         if(produtoFull === "MultiCheck") prodCode = "CH";
         else if(produtoFull === "MultiCrediário") prodCode = "CR";
         else if(produtoFull === "PayCheck") prodCode = "PAY";
-        else prodCode = produtoFull; // Fallback
+        else prodCode = produtoFull;
 
-        if(!razao || !lead || !estado) {
-            alert("Preencha Razão Social, Lead e Estado para gerar o e-mail.");
+        // VALIDAÇÃO BÁSICA DE CAMPOS (Incluindo Upload Sparta)
+        if(!razao || !lead || !estado || !document.getElementById('inputSegmento').value || !document.getElementById('inpLojas').value) {
+            alert("Preencha todos os campos obrigatórios (Razão, Lead, Estado, Lojas, Segmento, Produto) e faça o Upload.");
+            return;
+        }
+        
+        // Verifica Sparta Upload
+        const spartaInput = document.getElementById('uploadSparta');
+        if (spartaInput.files.length === 0) {
+            alert("ERRO: É obrigatório fazer o upload de pelo menos 1 arquivo no campo PESQUISA PROFUNDA (SPARTA).");
             return;
         }
 
-        // Gera e copia a imagem
         await gerarImagemResumo(true); 
         
-        // Monta o Assunto
-        const subject = encodeURIComponent(`${subTipo} - ${prodCode} - ${razao} - ${lead} - ${estado}`);
-        const body = encodeURIComponent(`Prezados,\n\nSegue abaixo a solicitação de vendas gerada pelo PPI.\n\n\n[COLE A IMAGEM AQUI (Pressione Ctrl + V)]\n\n\nAtenciosamente,\nComercial`);
+        // SAUDAÇÃO DINÂMICA
+        const now = new Date();
+        const hour = now.getHours();
+        const saudacao = hour < 12 ? "Bom dia" : "Boa tarde";
 
-        // Abre o cliente de e-mail
+        // CORPO DE E-MAIL DINÂMICO
+        const subject = encodeURIComponent(`${subTipo} - ${prodCode} - ${razao} - ${lead} - ${estado}`);
+        const rawBody = `${saudacao},
+
+Segue processo de vendas do prospect ${lead}.
+
+Em anexo as seguintes documentações:
+- Fotos da Loja (interno e externo)
+- Precificação
+- Consulta (Crivo)
+
+Abaixo Checklist da venda:
+
+`; // Quebras de linha para a imagem
+        const body = encodeURIComponent(rawBody);
+
         window.location.href = `mailto:?subject=${subject}&body=${body}`;
     }
 
@@ -408,6 +430,13 @@
                 return; 
             }
             if (typeof html2canvas === 'undefined') { alert("Erro: Biblioteca de geração de imagem não carregou. Verifique sua conexão."); return; }
+
+            // VALIDAÇÃO UPLOAD SPARTA (NOVA - 31.0)
+            const spartaInput = document.getElementById('uploadSparta');
+            if (spartaInput.files.length === 0) {
+                alert("ERRO: É obrigatório fazer o upload de pelo menos 1 arquivo no campo PESQUISA PROFUNDA (SPARTA).");
+                return;
+            }
 
             const pendenciasStr = document.getElementById('inputPendencias').value;
             const totalPendencias = limparValorMoeda(pendenciasStr);
