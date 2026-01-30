@@ -21,7 +21,8 @@
             /* Cores Específicas */
             --diag-blue: #3498db;
             --diag-green: #27ae60;
-            --check-blue: #2563eb; /* Azul do Checklist */
+            --check-blue: #2563eb; 
+            --link-gray: #495057; /* Cor dos Links Úteis */
         }
 
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e9ecef; margin: 0; padding: 20px; color: var(--text-color); }
@@ -82,6 +83,16 @@
             transition: background 0.3s;
         }
         .btn-doc-poc:hover { background-color: #117a8b; }
+
+        /* ESTILOS LINKS ÚTEIS */
+        .links-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        .btn-link-util {
+            background-color: var(--link-gray); color: white; text-decoration: none;
+            padding: 18px 20px; border-radius: 6px; font-weight: bold; font-size: 16px;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-link-util:hover { background-color: #343a40; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
 
         #resultadoModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; overflow-y: auto; padding: 20px; }
         .resultado-content { background: #fff; max-width: 800px; margin: 0 auto; padding: 20px; border-radius: 8px; text-align: center; }
@@ -360,6 +371,17 @@
                         <button class="btn-copy" onclick="copiarImagemChecklist()" style="background-color: var(--check-blue);">Copiar Imagem</button>
                     </div>
                     <div class="instrucao-copiar" style="margin-top:10px;"><strong>Dica:</strong> Clique em "Abrir E-mail" para abrir o Outlook/App e depois pressione <strong>Ctrl+V</strong>.</div>
+                </div>
+            </div>
+
+            <div id="linksUteisContainer" style="display: none; margin-top: 20px;">
+                <h3 style="color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;">Links Úteis</h3>
+                <div class="links-grid">
+                    <a href="https://app.pipefy.com/public/form/O763LwPs" target="_blank" class="btn-link-util">Solicitações e alterações de acesso SAG e SPARTA</a>
+                    <a href="https://app.pipefy.com/organizations/300866444/interfaces/4f19076a-2fd8-4cde-b260-8a6cb8c68953/pages/8032d96f-560d-4cb5-a9a4-135ce510f48a?form=5a4453b2-6ff9-4975-ab2e-ade02752b32c&origin=public%20form" target="_blank" class="btn-link-util">Solicitação Material Personalizado MKT</a>
+                    <a href="https://app.pipefy.com/public/form/BxoOP6Qe" target="_blank" class="btn-link-util">Solicitação de Campanha de SMS</a>
+                    <a href="https://app.pipefy.com/public/form/bOWr1AMn" target="_blank" class="btn-link-util">Integração Bancária</a>
+                    <a href="https://app.pipefy.com/public/form/rWfYUxZK" target="_blank" class="btn-link-util">Gestão e Flexibilização de Clientes</a>
                 </div>
             </div>
         </div>
@@ -682,11 +704,13 @@
         const placeholder = document.getElementById('msgPlaceholderPV');
         const formDiag = document.getElementById('formDiagnosticoCancelamento');
         const formCheck = document.getElementById('formChecklistImplantacao');
+        const linksContainer = document.getElementById('linksUteisContainer');
 
         // Reseta tudo
         placeholder.style.display = 'block';
         formDiag.style.display = 'none';
         formCheck.style.display = 'none';
+        linksContainer.style.display = 'none';
 
         if(select.value === 'DIAGNOSTICO') {
             placeholder.style.display = 'none';
@@ -694,6 +718,9 @@
         } else if (select.value === 'CHECKLIST') {
             placeholder.style.display = 'none';
             formCheck.style.display = 'block';
+        } else if (select.value === 'LINKS') {
+            placeholder.style.display = 'none';
+            linksContainer.style.display = 'block';
         } else if (select.value) {
             placeholder.innerText = "Formulário para: " + select.options[select.selectedIndex].text + " (Em construção...)";
         } else {
@@ -708,6 +735,7 @@
         const subTipoSelect = document.getElementById('subTipoVenda');
         const subTipo = subTipoSelect.value;
         const subTipoText = subTipoSelect.options[subTipoSelect.selectedIndex].text;
+        
         const produtoFull = document.getElementById('inpProduto').value;
         let prodCode = "";
         if(produtoFull === "MultiCheck") prodCode = "CH";
@@ -715,32 +743,70 @@
         else if(produtoFull === "PayCheck") prodCode = "PAY";
         else prodCode = produtoFull;
 
-        if(!razao || !lead || !estado) { alert("Preencha Razão Social, Lead e Estado."); return; }
-        if (subTipo === "CAPI") {
-             if(!document.getElementById('inputSegmento').value || !document.getElementById('inpLojas').value) { alert("Preencha Lojas e Segmento."); return; }
+        if(!razao || !lead || !estado) {
+            alert("Preencha Razão Social, Lead e Estado.");
+            return;
         }
+        
+        if (subTipo === "CAPI") {
+             if(!document.getElementById('inputSegmento').value || !document.getElementById('inpLojas').value) {
+                 alert("Preencha Lojas e Segmento.");
+                 return;
+             }
+        }
+        
         const spartaInput = document.getElementById('uploadSparta');
-        if (spartaInput.files.length === 0) { alert("ERRO: É obrigatório fazer o upload de pelo menos 1 arquivo no campo PESQUISA PROFUNDA (SPARTA)."); return; }
+        if (spartaInput.files.length === 0) {
+            alert("ERRO: É obrigatório fazer o upload de pelo menos 1 arquivo no campo PESQUISA PROFUNDA (SPARTA).");
+            return;
+        }
 
-        if (subTipo !== "POC") { await gerarImagemResumo(true); }
+        // SE FOR POC, NÃO GERA IMAGEM (PULA ESSA ETAPA)
+        if (subTipo !== "POC") {
+            await gerarImagemResumo(true);
+        }
         
         const now = new Date();
         const hour = now.getHours();
         const saudacao = hour < 12 ? "Bom dia" : "Boa tarde";
+
         const subject = encodeURIComponent(`${subTipoText} - ${prodCode} - ${razao} - ${lead} - ${estado}`);
         
         let rawBody = "";
+        
         if (subTipo === "POC") {
-            rawBody = `${saudacao},\n\nSegue processo para envio ao POC de Negócios do prospect ${lead}.\n\nEm anexo:\n\n- Apresentação de POC de Negócios\n- Consulta (Crivo)\n\nAbaixo diagnóstico do SPARTA:\n\n`;
+            rawBody = `${saudacao},
+
+Segue processo para envio ao POC de Negócios do prospect ${lead}.
+
+Em anexo:
+
+- Apresentação de POC de Negócios
+- Consulta (Crivo)
+
+Abaixo diagnóstico do SPARTA:
+
+`;
         } else {
-            rawBody = `${saudacao},\n\nSegue processo de vendas do prospect ${lead}.\n\nEm anexo as seguintes documentações:\n- Fotos da Loja (interno e externo)\n- Precificação\n- Consulta (Crivo)\n\nAbaixo Checklist da venda:\n\n`;
+            rawBody = `${saudacao},
+
+Segue processo de vendas do prospect ${lead}.
+
+Em anexo as seguintes documentações:
+- Fotos da Loja (interno e externo)
+- Precificação
+- Consulta (Crivo)
+
+Abaixo Checklist da venda:
+
+`;
         }
-        window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(rawBody)}`;
+
+        const body = encodeURIComponent(rawBody);
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
     }
 
     async function gerarImagemResumo(isEmailMode = false) {
-        // [MESMA LÓGICA ANTERIOR DE GERAR IMAGEM PARA VENDAS]
-        // ... (Omitido para economizar espaço, segue a lógica já estabelecida)
         try {
             const razao = document.getElementById('inpRazao').value.trim();
             const lead = document.getElementById('inpLead').value.trim();
@@ -751,13 +817,52 @@
             if (subTipo === "CAPI") {
                 const lojas = document.getElementById('inpLojas').value.trim();
                 const segmento = document.getElementById('inputSegmento').value;
-                if (!razao || !lead || !estado || !lojas || !segmento || !produto) { alert("ERRO: Preencha todos os campos obrigatórios (Razão, Lead, Estado, Lojas, Segmento, Produto)."); return; }
+                if (!razao || !lead || !estado || !lojas || !segmento || !produto) { 
+                    alert("ERRO: Preencha todos os campos obrigatórios (Razão, Lead, Estado, Lojas, Segmento, Produto)."); 
+                    return; 
+                }
             } else {
-                if (!razao || !lead || !estado || !produto) { alert("ERRO: Preencha todos os campos obrigatórios (Razão, Lead, Estado, Produto)."); return; }
+                if (!razao || !lead || !estado || !produto) { 
+                    alert("ERRO: Preencha todos os campos obrigatórios (Razão, Lead, Estado, Produto)."); 
+                    return; 
+                }
             }
+
             if (typeof html2canvas === 'undefined') { alert("Erro: Biblioteca de geração de imagem não carregou. Verifique sua conexão."); return; }
+
             const spartaInput = document.getElementById('uploadSparta');
-            if (spartaInput.files.length === 0) { alert("ERRO: É obrigatório fazer o upload de pelo menos 1 arquivo no campo PESQUISA PROFUNDA (SPARTA)."); return; }
+            if (spartaInput.files.length === 0) {
+                alert("ERRO: É obrigatório fazer o upload de pelo menos 1 arquivo no campo PESQUISA PROFUNDA (SPARTA).");
+                return;
+            }
+
+            if (subTipo === "CAPI") {
+                const parecer = document.getElementById('observacoesVendas').value || '';
+                if(parecer.length < 100) { alert(`ERRO: Parecer de Vendas deve ter no mínimo 100 caracteres.`); return; }
+                
+                const pendenciasStr = document.getElementById('inputPendencias').value;
+                const totalPendencias = limparValorMoeda(pendenciasStr);
+                if (totalPendencias > 7500.01) {
+                    let somaRestricoes = 0;
+                    let erroCamposTabela = false;
+                    document.querySelectorAll('#tabelaRestricoes tbody tr').forEach(row => {
+                        const inputs = row.querySelectorAll('input');
+                        const val = limparValorMoeda(inputs[2].value);
+                        if (inputs[2].value !== "" && (inputs[0].value.trim() === "" || inputs[1].value.trim() === "")) erroCamposTabela = true;
+                        somaRestricoes += val;
+                    });
+                    if (erroCamposTabela) { alert("Preencha Fornecedor e Tipo para as restrições."); return; }
+                    if (Math.abs(totalPendencias - somaRestricoes) > 0.01) { alert("Soma das restrições não bate com o total."); return; }
+                    const txtDefesa = document.getElementById('textoDefesaRestricao').value.trim();
+                    if (!document.getElementById('dataPrimeiraRestricao').value || !document.getElementById('dataUltimaRestricao').value) { alert("Preencha as datas das restrições."); return; }
+                    if (txtDefesa.length < 100) { alert("Defesa de restrições deve ter no mínimo 100 caracteres."); return; }
+                }
+                
+                if(document.getElementById('formDefesaTaxas').style.display === 'block') {
+                    const txtTaxas = document.getElementById('textoDefesaTaxas').value.trim();
+                    if(txtTaxas.length < 50) { alert("ERRO: Defesa das Taxas deve ter no mínimo 50 caracteres."); return; }
+                }
+            }
 
             const reportDiv = document.getElementById('reportToImage');
             const contentDiv = document.getElementById('reportContent');
@@ -769,14 +874,24 @@
             const subTipoText = sb.options[sb.selectedIndex].text;
             document.querySelector('#reportToImage h2').innerText = `SOLICITAÇÃO DE ${tipo} - ${subTipoText}`;
 
-            let html = `<div class="rep-row"><span class="rep-label">Tipo:</span> <span class="rep-value">VENDAS (${subTipoText})</span></div><div class="rep-row"><span class="rep-label">Razão:</span> <span class="rep-value">${razao}</span></div><div class="rep-row"><span class="rep-label">Lead:</span> <span class="rep-value">${lead}</span></div><div class="rep-row"><span class="rep-label">Estado:</span> <span class="rep-value">${estado}</span></div><div class="rep-row"><span class="rep-label">Produto:</span> <span class="rep-value">${produto}</span></div>`;
+            let html = `<div class="rep-row"><span class="rep-label">Tipo:</span> <span class="rep-value">VENDAS (${subTipoText})</span></div>
+                        <div class="rep-row"><span class="rep-label">Razão:</span> <span class="rep-value">${razao}</span></div>
+                        <div class="rep-row"><span class="rep-label">Lead:</span> <span class="rep-value">${lead}</span></div>
+                        <div class="rep-row"><span class="rep-label">Estado:</span> <span class="rep-value">${estado}</span></div>
+                        <div class="rep-row"><span class="rep-label">Produto:</span> <span class="rep-value">${produto}</span></div>`;
 
             if (subTipo === "CAPI") {
                 const lojas = document.getElementById('inpLojas').value.trim();
                 const segmento = document.getElementById('inputSegmento').value;
                 const foraAlcada = document.getElementById('selectForaAlcada').value;
-                html += `<div class="rep-row"><span class="rep-label">Lojas:</span> <span class="rep-value">${lojas}</span></div><div class="rep-row"><span class="rep-label">Segmento:</span> <span class="rep-value">${segmento}</span></div>`;
-                if (foraAlcada === 'NAO') { html += `<div class="rep-row"><span class="rep-label">Fora Alçada?</span> <span class="rep-value">${foraAlcada}</span></div>`; }
+
+                html += `<div class="rep-row"><span class="rep-label">Lojas:</span> <span class="rep-value">${lojas}</span></div>
+                         <div class="rep-row"><span class="rep-label">Segmento:</span> <span class="rep-value">${segmento}</span></div>`;
+                
+                if (foraAlcada === 'NAO') {
+                    html += `<div class="rep-row"><span class="rep-label">Fora Alçada?</span> <span class="rep-value">${foraAlcada}</span></div>`;
+                }
+
                 if(foraAlcada === 'SIM') {
                     html += `<h3>Condições Especiais</h3><table class="rep-table"><thead><tr><th>Item</th><th>Valor</th><th>Alçada</th></tr></thead><tbody>`;
                     document.querySelectorAll('#tabelaCondicoesBase tbody tr').forEach(tr => {
@@ -787,6 +902,7 @@
                         let alc = tds[2].querySelector('select') ? tds[2].querySelector('select').value : '';
                         if(alc !== "Aprovado") html += `<tr><td>${item}</td><td>${val}</td><td>${alc}</td></tr>`;
                     });
+                    
                     document.querySelectorAll('#tbodyAlcadaExtras tr').forEach(tr => {
                         const tds = tr.querySelectorAll('td');
                         let valElement = tds[1].querySelector('input') || tds[1].querySelector('select');
@@ -795,22 +911,49 @@
                         if(alc !== "Aprovado") html += `<tr><td>${tds[0].innerText.trim()}</td><td>${val}</td><td>${alc}</td></tr>`;
                     });
                     html += `</tbody></table>`;
-                    
+
                     const pendenciasStr = document.getElementById('inputPendencias').value;
-                    if(limparValorMoeda(pendenciasStr) > 7500.01) { html += `<div style="border: 2px solid #dc3545; padding: 10px; margin-top: 15px;"><strong>DEFESA PENDÊNCIAS:</strong> ${document.getElementById('textoDefesaRestricao').value}</div>`; }
-                    if(document.getElementById('formDefesaTaxas').style.display === 'block') { html += `<div style="border: 2px solid #dc3545; padding: 10px; margin-top: 15px;"><strong>DEFESA TAXAS:</strong> ${document.getElementById('textoDefesaTaxas').value}</div>`; }
+                    const totalPendencias = limparValorMoeda(pendenciasStr);
+                    if(totalPendencias > 7500.01) {
+                         const def = document.getElementById('textoDefesaRestricao').value;
+                         html += `<div style="border: 2px solid #dc3545; padding: 10px; margin-top: 15px; border-radius: 5px; background-color: #fff8f8;">
+                                    <h4 style="color: #dc3545; margin-top: 0; border-bottom: none;">⚠️ Detalhamento de Restrições (> R$ 7.500,01)</h4>
+                                    <div style="margin-top:10px; padding:10px; background:white; border:1px solid #f5c6cb;">
+                                        <div style="white-space: pre-wrap;">${def}</div>
+                                    </div>
+                                  </div>`;
+                    }
+                    if(document.getElementById('formDefesaTaxas').style.display === 'block') {
+                        const tituloTaxas = document.getElementById('tituloDefesaTaxas').innerText;
+                        const textoTaxas = document.getElementById('textoDefesaTaxas').value;
+                        html += `<div style="border: 2px solid #dc3545; padding: 10px; margin-top: 15px; border-radius: 5px; background-color: #fff8f8;">
+                                    <h4 style="color: #dc3545; margin-top: 0; border-bottom: none;">⚠️ ${tituloTaxas}</h4>
+                                    <div style="margin-top:10px; padding:10px; background:white; border:1px solid #f5c6cb;">
+                                        <div style="white-space: pre-wrap;">${textoTaxas}</div>
+                                    </div>
+                                 </div>`;
+                    }
                 }
-                html += `<div style="margin-top:20px; border:1px solid #ddd; padding:10px;"><strong>PARECER:</strong><br>${document.getElementById('observacoesVendas').value}</div>`;
+                
+                const parecer = document.getElementById('observacoesVendas').value;
+                html += `<div style="margin-top:20px; border:1px solid #ddd; padding:10px;">
+                            <strong>PARECER:</strong><br>
+                            <div style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; margin-top:5px;">${parecer}</div>
+                         </div>`;
             }
+
             contentDiv.innerHTML = html;
-            if (spartaInput.files.length > 0) {
+
+            const fileInput = document.getElementById('uploadSparta');
+            if (fileInput.files.length > 0) {
                 imgDiv.innerHTML = '<h3>PESQUISA PROFUNDA (SPARTA):</h3>';
-                for (let i = 0; i < spartaInput.files.length; i++) {
+                for (let i = 0; i < fileInput.files.length; i++) {
                     const reader = new FileReader();
                     reader.onload = (e) => { const img = document.createElement('img'); img.src = e.target.result; imgDiv.appendChild(img); };
-                    reader.readAsDataURL(spartaInput.files[i]);
+                    reader.readAsDataURL(fileInput.files[i]);
                 }
             }
+
             setTimeout(() => {
                 html2canvas(reportDiv, { scale: 1 }).then(canvas => {
                     const out = document.getElementById('imgOutputContainer'); out.innerHTML = '';
@@ -818,20 +961,29 @@
                     if(isEmailMode) { copiarImagem(); } else { document.getElementById('resultadoModal').style.display = 'block'; }
                 }).catch(e => alert("Erro ao renderizar imagem: " + e));
             }, 800);
-        } catch(err) { alert("Erro: " + err.message); }
+        } catch(err) {
+            alert("Erro fatal no script: " + err.message);
+            console.error(err);
+        }
     }
 
     function copiarImagem() {
         const canvas = document.getElementById('finalCanvas');
         if(!canvas) return;
         canvas.toBlob(blob => {
-            try { const item = new ClipboardItem({ 'image/png': blob }); navigator.clipboard.write([item]).then(() => { alert('Imagem copiada! Cole no e-mail (Ctrl+V).'); }).catch(err => { alert("Use o botão direito."); }); } catch (e) { alert("Use o botão direito."); }
+            try {
+                const item = new ClipboardItem({ 'image/png': blob });
+                navigator.clipboard.write([item]).then(() => { alert('Imagem copiada! Cole no e-mail (Ctrl+V).'); }).catch(err => { alert("Use o botão direito ou baixar."); });
+            } catch (e) { alert("Use o botão direito."); }
         });
     }
     function baixarImagem() {
         const canvas = document.getElementById('finalCanvas');
         if(!canvas) return;
-        const link = document.createElement('a'); link.download = 'PPI_Solicitacao.png'; link.href = canvas.toDataURL(); link.click();
+        const link = document.createElement('a');
+        link.download = 'PPI_Solicitacao.png';
+        link.href = canvas.toDataURL();
+        link.click();
     }
 
     // --------------------------------------------------------------------------------
